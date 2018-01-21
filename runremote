@@ -1,0 +1,2 @@
+#!/bin/sh
+ssh -t -t pi@raspberrypi 'cd src/scoreboard && python twodigitdisplay.py'
