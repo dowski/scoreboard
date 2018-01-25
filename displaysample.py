@@ -6,7 +6,9 @@ VALID_TARGETS = ["hardware", "software"]
 try:
     from led.twodigit import TwoDigitDisplay
 except ImportError:
-    VALID_TARGETS.remove("hardware")
+    HW_AVAILABLE = False
+else:
+    HW_AVAILABLE = True
 from cursesdisplay import CursesDisplay
 
 
@@ -19,6 +21,9 @@ def main(argv):
     if target == "software":
         display = CursesDisplay()
     elif target == "hardware":
+        if not HW_AVAILABLE:
+            print "error: hardware not available; is gpiozero installed?"
+            sys.exit(1)
         display = TwoDigitDisplay()
     else:
         raise RuntimeError("unhandled target: %s" % target)
