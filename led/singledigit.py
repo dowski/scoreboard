@@ -6,10 +6,10 @@ class SingleDigitDisplay(object):
 
     def enable(self):
         self.control_pin.on()
-    
+
     def disable(self):
         self.control_pin.off()
-    
+
     def set(self, n):
         value = board.digits[n]
         for bit in value:

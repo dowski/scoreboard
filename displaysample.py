@@ -4,7 +4,7 @@ import time
 VALID_TARGETS = ["hardware", "software"]
 
 try:
-    from twodigitdisplay import TwoDigitDisplay
+    from led.twodigit import TwoDigitDisplay
 except ImportError:
     VALID_TARGETS.remove("hardware")
 from cursesdisplay import CursesDisplay

@@ -4,7 +4,7 @@ import Queue
 
 import board
 
-from singledigitdisplay import SingleDigitDisplay
+from .singledigit import SingleDigitDisplay
 
 
 class TwoDigitDisplay(object):
