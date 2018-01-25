@@ -23,7 +23,7 @@ class TwoDigitDisplay(object):
         self.right = SingleDigitDisplay(board.right_display)
         self.commands = Queue.Queue()
         self.render_thread = threading.Thread(target=self._render)
-    
+
     def enable(self):
         """Prepare the display for use.
 
@@ -31,7 +31,7 @@ class TwoDigitDisplay(object):
 
         """
         self.render_thread.start()
-    
+
     def show(self, v):
         """Show a number between 0 and 99 on the display.
 
@@ -59,7 +59,7 @@ class TwoDigitDisplay(object):
                 self._show(value)
             elif command == 'disable':
                 break
-    
+
     def _show(self, n):
         if n > 99:
             self._show_error()
@@ -75,7 +75,7 @@ class TwoDigitDisplay(object):
         self.right.enable()
         time.sleep(0.01)
         self.right.disable()
-    
+
     def _show_both(self, left_n, right_n):
         self.left.set(left_n)
         self.left.enable()
@@ -85,7 +85,7 @@ class TwoDigitDisplay(object):
         self.right.enable()
         time.sleep(0.005)
         self.right.disable()
-    
+
     def _show_error(self):
         self.right.set(-1)
         self.left.set(-1)
@@ -94,14 +94,3 @@ class TwoDigitDisplay(object):
         time.sleep(0.01)
         self.right.disable()
         self.left.disable()
-
-if __name__ == '__main__':
-    d = TwoDigitDisplay()
-    d.enable()
-    try:
-        while True:
-            for i in xrange(100):
-                d.show(i)
-                time.sleep(1)
-    finally:
-        d.disable()
