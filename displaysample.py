@@ -1,7 +1,11 @@
+import datetime
 import sys
 import time
 
+import mlbgame
+
 VALID_TARGETS = ["hardware", "software"]
+STREAK_START = datetime.date(2017, 8, 24)
 
 try:
     from led.twodigit import TwoDigitDisplay
@@ -31,11 +35,46 @@ def main(argv):
     display.enable()
     try:
         while True:
-            for i in xrange(100):
-                display.show(i)
-                time.sleep(0.1)
+            for game in get_streak_games("Indians"):
+                runs = get_team_runs(game, "Indians")
+                display.show(runs)
+                time.sleep(1)
+            display.show(-1)
+            time.sleep(1)
     finally:
         display.disable()
+
+_streak_games_cache = []
+def get_streak_games(team):
+    if _streak_games_cache:
+        return iter(_streak_games_cache)
+    return _fetch_and_cache_streak(team)
+
+def _fetch_and_cache_streak(team):
+    date = STREAK_START
+    temp_cache = []
+    while True:
+        games = mlbgame.day(date.year, date.month, date.day,
+                home=team, away=team)
+        date += datetime.timedelta(days=1)
+        still_winning = True
+        for game in games:
+            if game.game_status != "FINAL":
+                continue
+            still_winning = game.w_team == team
+            if not still_winning:
+                break
+            if not _streak_games_cache:
+                temp_cache.append(game)
+            yield game
+        if not still_winning:
+            _streak_games_cache.extend(temp_cache)
+            break
+
+def get_team_runs(game, team):
+    if team == game.home_team:
+        return game.home_team_runs
+    return game.away_team_runs
 
 if __name__ == '__main__':
     main(sys.argv)
