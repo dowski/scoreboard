@@ -37,8 +37,8 @@ class CursesDisplay():
 
     def _show(self, n):
         self.stdscr.addstr(self.hy, self.hx - 1, "  ")
-        nposx = self.hx if n < 10 else self.hx - 1
-        self.stdscr.addstr(self.hy, nposx, str(n))
+        nposx = self.hx if 0 < n < 10 else self.hx - 1
+        self.stdscr.addstr(self.hy, nposx, str(n) if n >= 0 else "--")
         self.stdscr.refresh()
 
     def disable(self):
