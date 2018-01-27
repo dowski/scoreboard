@@ -1,4 +1,5 @@
-import board
+import control
+
 
 class SingleDigitDisplay(object):
     def __init__(self, control_pin):
@@ -11,21 +12,23 @@ class SingleDigitDisplay(object):
         self.control_pin.off()
 
     def set(self, n):
-        value = board.digits[n]
+        value = control.DIGITS[n]
         for bit in value:
             if bit:
-                board.data.on()
+                control.data.on()
             else:
-                board.data.off()
-            board.clk.on()
-            board.clk.off()
-        board.latch.on()
-        board.latch.off()
+                control.data.off()
+            control.clk.on()
+            control.clk.off()
+        control.latch.on()
+        control.latch.off()
 
 if __name__ == '__main__':
+    import control
     import time
-    left = SingleDigitDisplay(board.left_display)
-    right = SingleDigitDisplay(board.right_display)
+
+    left = SingleDigitDisplay(control.left_display)
+    right = SingleDigitDisplay(control.right_display)
 
     while True:
         left.set(4)

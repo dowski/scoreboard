@@ -2,7 +2,7 @@ import threading
 import time
 import Queue
 
-import board
+import control
 
 from .singledigit import SingleDigitDisplay
 
@@ -19,8 +19,8 @@ class TwoDigitDisplay(object):
 
     """
     def __init__(self):
-        self.left = SingleDigitDisplay(board.left_display)
-        self.right = SingleDigitDisplay(board.right_display)
+        self.left = SingleDigitDisplay(control.left_display)
+        self.right = SingleDigitDisplay(control.right_display)
         self.commands = Queue.Queue()
         self.render_thread = threading.Thread(target=self._render)
 

@@ -8,7 +8,7 @@ VALID_TARGETS = ["hardware", "software"]
 STREAK_START = datetime.date(2017, 8, 24)
 
 try:
-    from led.twodigit import TwoDigitDisplay
+    from board.twodigit import TwoDigitDisplay
 except ImportError:
     HW_AVAILABLE = False
 else:
