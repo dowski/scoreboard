@@ -40,6 +40,12 @@ class TwoDigitDisplay(object):
         """
         self.commands.put(('show', v))
 
+    def hide(self):
+        """Don't show anything on the display.
+
+        """
+        self.commands.put(('hide', None))
+
     def disable(self):
         """Call this method when you are done with the display instance.
 
@@ -57,18 +63,24 @@ class TwoDigitDisplay(object):
                 pass
             if command == 'show':
                 self._show(value)
+            elif command == 'hide':
+                self._hide()
             elif command == 'disable':
                 break
 
     def _show(self, n):
-        if n > 99:
+        left_digit, right_digit = divmod(n, 10)
+        if 0 > left_digit or left_digit > 9:
             self._show_error()
             return
-        left_digit, right_digit = divmod(n, 10)
         if left_digit > 0:
             self._show_both(left_digit, right_digit)
         else:
             self._show_right_only(right_digit)
+
+    def _hide(self):
+        self.right.disable()
+        self.left.disable()
 
     def _show_right_only(self, n):
         self.right.set(n)
@@ -94,3 +106,4 @@ class TwoDigitDisplay(object):
         time.sleep(0.01)
         self.right.disable()
         self.left.disable()
+

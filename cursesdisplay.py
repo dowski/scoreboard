@@ -29,16 +29,25 @@ class CursesDisplay():
             command, value = self._commands.get()
             if command == "quit":
                 break
-            assert command == "show"
-            self._show(value)
+            if command == "show":
+                self._show(value)
+            elif command == "hide":
+                self._hide()
 
     def show(self, n):
         self._commands.put(("show", n))
+
+    def hide(self):
+        self._commands.put(("hide", None))
 
     def _show(self, n):
         self.stdscr.addstr(self.hy, self.hx - 1, "  ")
         nposx = self.hx if 0 < n < 10 else self.hx - 1
         self.stdscr.addstr(self.hy, nposx, str(n) if n >= 0 else "--")
+        self.stdscr.refresh()
+
+    def _hide(self):
+        self.stdscr.addstr(self.hy, self.hx - 1, "  ")
         self.stdscr.refresh()
 
     def disable(self):

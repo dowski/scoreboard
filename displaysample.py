@@ -37,12 +37,17 @@ def main(argv):
         while True:
             for game in get_streak_games("Indians"):
                 runs = get_team_runs(game, "Indians")
-                display.show(runs)
-                time.sleep(1)
-            display.show(-1)
-            time.sleep(1)
+                show_runs(display, runs)
+            # showing -1 actually shows -- on the display
+            show_runs(display, -1)
     finally:
         display.disable()
+
+def show_runs(display, runs):
+    display.show(runs)
+    time.sleep(2)
+    display.hide()
+    time.sleep(.5)
 
 _streak_games_cache = []
 def get_streak_games(team):
