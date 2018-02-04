@@ -8,7 +8,7 @@ VALID_TARGETS = ["hardware", "software"]
 STREAK_START = datetime.date(2017, 8, 24)
 
 try:
-    from board.twodigit import TwoDigitDisplay
+    from board.display import DisplayController
 except ImportError:
     HW_AVAILABLE = False
 else:
@@ -28,25 +28,26 @@ def main(argv):
         if not HW_AVAILABLE:
             print "error: hardware not available; is gpiozero installed?"
             sys.exit(1)
-        display = TwoDigitDisplay()
+        display = DisplayController()
     else:
         raise RuntimeError("unhandled target: %s" % target)
 
-    display.enable()
+    display.on()
     try:
         while True:
             for game in get_streak_games("Indians"):
-                runs = get_team_runs(game, "Indians")
-                show_runs(display, runs)
+                indians, opponent = get_game_runs(game, "Indians")
+                show_runs(display, indians, opponent)
             # showing -1 actually shows -- on the display
-            show_runs(display, -1)
+            show_runs(display, -1, -1)
     finally:
-        display.disable()
+        display.off()
 
-def show_runs(display, runs):
-    display.show(runs)
+def show_runs(display, indians, opponent):
+    display.set_left(indians)
+    display.set_right(opponent)
     time.sleep(2)
-    display.hide()
+    display.clear_all()
     time.sleep(.5)
 
 _streak_games_cache = []
@@ -76,10 +77,11 @@ def _fetch_and_cache_streak(team):
             _streak_games_cache.extend(temp_cache)
             break
 
-def get_team_runs(game, team):
+def get_game_runs(game, team):
+    """Returns the Indians' runs first, and opponent second."""
     if team == game.home_team:
-        return game.home_team_runs
-    return game.away_team_runs
+        return (game.home_team_runs, game.away_team_runs)
+    return (game.away_team_runs, game.home_team_runs)
 
 if __name__ == '__main__':
     main(sys.argv)

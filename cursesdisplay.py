@@ -9,7 +9,7 @@ class CursesDisplay():
     def __init__(self):
         self._render_thread = threading.Thread(target=lambda: curses.wrapper(self.app))
 
-    def enable(self):
+    def on(self):
         self._commands = Queue()
         self._render_thread.start()
 
@@ -34,10 +34,13 @@ class CursesDisplay():
             elif command == "hide":
                 self._hide()
 
-    def show(self, n):
+    def set_left(self, n):
         self._commands.put(("show", n))
 
-    def hide(self):
+    def set_right(self, n):
+        pass
+
+    def clear_all(self):
         self._commands.put(("hide", None))
 
     def _show(self, n):
@@ -50,5 +53,5 @@ class CursesDisplay():
         self.stdscr.addstr(self.hy, self.hx - 1, "  ")
         self.stdscr.refresh()
 
-    def disable(self):
+    def off(self):
         self._commands.put(("quit", None))
