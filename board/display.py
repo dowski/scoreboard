@@ -35,11 +35,11 @@ class DisplayController(object):
         self.commands.put(('set', list(self.values)))
 
     def set_inning(self, value):
-        self.values[2] = value
+        self.values[0] = value
         self.commands.put(('set', list(self.values)))
 
     def set_top_score(self, value):
-        self.values[0] = value
+        self.values[2] = value
         self.commands.put(('set', list(self.values)))
 
     def set_bottom_score(self, value):
