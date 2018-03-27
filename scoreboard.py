@@ -4,10 +4,23 @@ import time
 
 import mlbgame
 
-from board.display import DisplayController
+try:
+    from board.display import DisplayController
+except ImportError:
+    class DisplayController:
+        def on(self):
+            pass
+        def off(self):
+            pass
+        def set_top_score(self, runs):
+            pass
+        def set_bottom_score(self, runs):
+            pass
+        def set_inning(self, inning):
+            pass
 
 
-INDIANS = "Indians"
+DEFAULT_TEAM = "Indians"
 IN_PROGRESS = "In Progress"
 WARMUP = "Warmup"
 FINAL = "Final"
@@ -17,10 +30,11 @@ DELAYED_START = "Delayed Start"
 TRACKABLE_STATUSES = set([IN_PROGRESS, WARMUP, DELAYED, DELAYED_START])
 
 
-def handle_day(scheduler, display):
+def handle_day(scheduler, display, team):
     now = datetime.datetime.now()
     todays_games = mlbgame.day(now.year, now.month, now.day,
-            home=INDIANS, away=INDIANS)
+            home=team, away=team)
+    print "%d games today" % len(todays_games)
     for game in todays_games:
         if game.date <= now:
             game_details = mlbgame.overview(game.game_id)
@@ -28,6 +42,12 @@ def handle_day(scheduler, display):
                 track_game(scheduler, game.game_id, display)
         else:
             schedule_tracking(scheduler, game.game_id)
+    next_day = (now + datetime.timedelta(days=1)).replace(
+            hour=8, minute=0, second=0, microsecond=0)
+    wait_seconds = (next_day - datetime.datetime.now()).seconds
+    print "Scheduling for %s tomorrow (%d seconds from now)" % (
+            next_day, wait_seconds)
+    scheduler.enter(wait_seconds, 0, handle_day, (scheduler, display))
 
 def track_game(scheduler, game_id, display):
     game_details = mlbgame.overview(game_id)
@@ -48,10 +68,16 @@ def schedule_tracking(scheduler, game_id):
     pass
 
 if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        team = sys.argv[1]
+    else:
+        team = DEFAULT_TEAM
+    print "Starting %s scoreboard" % team
     display = DisplayController()
     display.on()
     scheduler = sched.scheduler(time.time, time.sleep)
-    scheduler.enter(0, 0, handle_day, (scheduler, display))
+    scheduler.enter(0, 0, handle_day, (scheduler, display, team))
     try:
         scheduler.run()
     finally:
