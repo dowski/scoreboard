@@ -36,18 +36,30 @@ def handle_day(scheduler, display, team):
             home=team, away=team)
     print "%d games today" % len(todays_games)
     for game in todays_games:
-        if game.date <= now:
+        # hack the start time until my PR is accepted
+        year, month, day = game.game_id.split('_')[:3]
+        game_start_date = "/".join([year, month, day])
+        start_time = datetime.datetime.strptime(
+               " ".join([game_start_date,
+                    game.game_start_time.replace(' ', '')]),
+               "%Y/%m/%d %I:%M%p")
+        if start_time <= now:
             game_details = mlbgame.overview(game.game_id)
             if game_details.status in TRACKABLE_STATUSES:
                 track_game(scheduler, game.game_id, display)
         else:
-            schedule_tracking(scheduler, game.game_id)
+            wait_game = (start_time - datetime.datetime.now()).seconds
+            print ("Tracking for today's game (%s) will start at "
+                    "%s (%d seconds from now)") % (
+                            game.game_id, _format_time(start_time), wait_game)
+            scheduler.enter(wait_game, 0, track_game,
+                    (scheduler, game.game_id, display))
     next_day = (now + datetime.timedelta(days=1)).replace(
             hour=8, minute=0, second=0, microsecond=0)
-    wait_seconds = (next_day - datetime.datetime.now()).seconds
-    print "Scheduling for %s tomorrow (%d seconds from now)" % (
-            next_day, wait_seconds)
-    scheduler.enter(wait_seconds, 0, handle_day, (scheduler, display))
+    wait_tomorrow = (next_day - datetime.datetime.now()).total_seconds()
+    print "Checking tomorrow's schedule at %s (%d seconds from now)" % (
+            _format_time(next_day), wait_tomorrow)
+    scheduler.enter(wait_tomorrow, 0, handle_day, (scheduler, display))
 
 def track_game(scheduler, game_id, display):
     game_details = mlbgame.overview(game_id)
@@ -57,15 +69,17 @@ def track_game(scheduler, game_id, display):
             game_details.away_team_runs,
             game_details.inning_state,
             game_details.inning)
-    display.set_top_score(game_details.away_team_runs)
-    display.set_bottom_score(game_details.home_team_runs)
-    display.set_inning(game_details.inning)
+    display.set_top_score(_get_safe_number(game_details.away_team_runs))
+    display.set_bottom_score(_get_safe_number(game_details.home_team_runs))
+    display.set_inning(_get_safe_number(game_details.inning))
     if game_details.status in TRACKABLE_STATUSES:
         scheduler.enter(30, 0, track_game, (scheduler, game_id, display))
 
-def schedule_tracking(scheduler, game_id):
-    print "Can't schedule tracking yet"
-    pass
+def _get_safe_number(value):
+    return value if value != '' else 0
+
+def _format_time(dt):
+    return dt.time().strftime("%I:%M%p")
 
 if __name__ == '__main__':
     import sys
