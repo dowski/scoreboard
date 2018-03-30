@@ -59,7 +59,7 @@ def handle_day(scheduler, display, team):
     wait_tomorrow = (next_day - datetime.datetime.now()).total_seconds()
     print "Checking tomorrow's schedule at %s (%d seconds from now)" % (
             _format_time(next_day), wait_tomorrow)
-    scheduler.enter(wait_tomorrow, 0, handle_day, (scheduler, display))
+    scheduler.enter(wait_tomorrow, 0, handle_day, (scheduler, display, team))
 
 def track_game(scheduler, game_id, display):
     game_details = mlbgame.overview(game_id)
