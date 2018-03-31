@@ -1,6 +1,8 @@
 import datetime
 import sched
+import signal
 import time
+import urllib2
 
 import mlbgame
 
@@ -19,6 +21,9 @@ except ImportError:
         def set_inning(self, inning):
             pass
 
+class Timeout(Exception):
+    pass
+
 
 DEFAULT_TEAM = "Indians"
 IN_PROGRESS = "In Progress"
@@ -28,12 +33,21 @@ CANCELLED = "Cancelled"
 DELAYED = "Delayed"
 DELAYED_START = "Delayed Start"
 TRACKABLE_STATUSES = set([IN_PROGRESS, WARMUP, DELAYED, DELAYED_START])
+GAME_FETCH_TIMEOUT = 10
+TIMEOUT_DELAY = 10
 
 
 def handle_day(scheduler, display, team):
     now = datetime.datetime.now()
-    todays_games = mlbgame.day(now.year, now.month, now.day,
-            home=team, away=team)
+    try:
+        signal.alarm(GAME_FETCH_TIMEOUT)
+        todays_games = mlbgame.day(now.year, now.month, now.day,
+                home=team, away=team)
+        signal.alarm(0)
+    except (urllib2.URLError, Timeout) as e:
+        print "failed to fetch games - will try again"
+        scheduler.enter(TIMEOUT_DELAY, 0, handle_day, (scheduler, display, team))
+        return
     print "%d games today" % len(todays_games)
     for game in todays_games:
         # hack the start time until my PR is accepted
@@ -44,9 +58,16 @@ def handle_day(scheduler, display, team):
                     game.game_start_time.replace(' ', '')]),
                "%Y/%m/%d %I:%M%p")
         if start_time <= now:
-            game_details = mlbgame.overview(game.game_id)
-            if game_details.status in TRACKABLE_STATUSES:
-                track_game(scheduler, game.game_id, display)
+            try:
+                signal.alarm(GAME_FETCH_TIMEOUT)
+                game_details = mlbgame.overview(game.game_id)
+                signal.alarm(0)
+                if game_details.status in TRACKABLE_STATUSES:
+                    track_game(scheduler, game.game_id, display)
+            except (urllib2.URLError, Timeout) as e:
+                print "failed to fetch games - will try again"
+                scheduler.enter(TIMEOUT_DELAY, 0, handle_day, (scheduler, display, team))
+                return
         else:
             wait_game = (start_time - datetime.datetime.now()).seconds
             print ("Tracking for today's game (%s) will start at "
@@ -62,7 +83,14 @@ def handle_day(scheduler, display, team):
     scheduler.enter(wait_tomorrow, 0, handle_day, (scheduler, display, team))
 
 def track_game(scheduler, game_id, display):
-    game_details = mlbgame.overview(game_id)
+    try:
+        signal.alarm(5)
+        game_details = mlbgame.overview(game_id)
+        signal.alarm(0)
+    except (urllib2.URLError, Timeout) as e:
+        print "rescheduling after error fetching due to", e
+        scheduler.enter(30, 0, track_game, (scheduler, game_id, display))
+        return
     print "%s: %d, %s: %d, %s of %d" % (game_details.home_team_name,
             game_details.home_team_runs,
             game_details.away_team_name,
@@ -88,6 +116,9 @@ if __name__ == '__main__':
     else:
         team = DEFAULT_TEAM
     print "Starting %s scoreboard" % team
+    def handle_alarm(ignored, alsoignored):
+        raise Timeout()
+    signal.signal(signal.SIGALRM, handle_alarm)
     display = DisplayController()
     display.on()
     scheduler = sched.scheduler(time.time, time.sleep)
