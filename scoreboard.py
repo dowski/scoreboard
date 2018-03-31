@@ -102,6 +102,8 @@ def track_game(scheduler, game_id, display):
     display.set_inning(_get_safe_number(game_details.inning))
     if game_details.status in TRACKABLE_STATUSES:
         scheduler.enter(30, 0, track_game, (scheduler, game_id, display))
+    else:
+        print "game no longer trackable, status:", game_details.status
 
 def _get_safe_number(value):
     return value if value != '' else 0
