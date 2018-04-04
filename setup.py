@@ -19,6 +19,14 @@ REQUIRED = [
     'mlbgame',
 ]
 
+REQUIRED_FOR_TESTS = [
+    'pytest',
+]
+
+REQUIRED_FOR_SETUP = [
+    'pytest-runner',
+]
+
 # The rest you shouldn't have to touch too much :)
 # ------------------------------------------------
 # Except, perhaps the License and Trove Classifiers!
@@ -56,6 +64,8 @@ setup(
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
     install_requires=REQUIRED,
+    setup_requires=REQUIRED_FOR_SETUP,
+    tests_require=REQUIRED_FOR_TESTS,
     include_package_data=True,
     license='Proprietary',
 )

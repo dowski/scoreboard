@@ -12,6 +12,7 @@ REPLAY = "Replay"
 REVIEW = "Review"
 TRACKABLE_STATUSES = set([
     IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, CHALLENGE, REPLAY, REVIEW])
+RESCHEDULE_DELAY = 30
 
 
 class GameTracker(object):
@@ -47,7 +48,7 @@ class GameTracker(object):
             game_details = self.mlbapi.get_game_detail(game_id)
         except FetchError as e:
             print "rescheduling after error fetching due to", e
-            self.jobs.enter(30, 0, self.track, (game_id,))
+            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
             return
         print "%s: %d, %s: %d, %s of %d" % (game_details.home_team_name,
                 game_details.home_team_runs,
@@ -66,7 +67,7 @@ class GameTracker(object):
         self.display.set_inning(_get_safe_number(game_details.inning))
 
         if self.is_trackable(game_details.status):
-            self.jobs.enter(30, 0, self.track, (game_id,))
+            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
         else:
             print "game no longer trackable, status:", game_details.status
 
