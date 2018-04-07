@@ -24,6 +24,9 @@ DIGITS = {
  None: [0,0,0,0,0,0,0,0], # blank
 }
 
+# The index of the bit in the DIGITS lists representing the decimal point
+DECIMAL_INDEX = 6
+
 # Shift register pins
 # -------------------
 
@@ -44,3 +47,9 @@ latch = LED(15)
 # This way each digit on the dual display can be controled independently.
 left_display = LED(23, initial_value=False)
 right_display = LED(24, initial_value=False)
+
+def get_digit_bits(value, include_decimal_bit):
+    digit_bits = DIGITS[value][:]
+    if include_decimal_bit:
+        digit_bits[DECIMAL_INDEX] = 1
+    return digit_bits

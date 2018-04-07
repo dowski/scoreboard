@@ -64,7 +64,8 @@ class GameTracker(object):
         self.display.set_bottom_score(
                 _get_safe_number(game_details.home_team_runs))
         # Sets the current inning
-        self.display.set_inning(_get_safe_number(game_details.inning))
+        self.display.set_inning(_get_safe_number(game_details.inning),
+                is_bottom=_is_bottom_of_inning(game_details))
 
         if self.is_trackable(game_details.status):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
@@ -74,6 +75,9 @@ class GameTracker(object):
     @staticmethod
     def is_trackable(status):
         return status in TRACKABLE_STATUSES
+
+def _is_bottom_of_inning(game_details):
+    return game_details.inning_state.lower() in ["bottom", "end"]
 
 def _get_safe_number(value):
     return value if value != '' else 0

@@ -21,22 +21,31 @@ class Multiplexor(object):
         self.left_digit = left_digit_toggle
         self.right_digit = right_digit_toggle
         self.values = [None] * display_count
+        self.right_decimals = [False] * display_count
+        self.left_decimals = [False] * display_count
         self.left_bits = [0] * 8 * display_count
         self.right_bits = [0] * 8 * display_count
 
-    def set(self, display_index, value):
+    def set(self, display_index, value, left_decimal_on, right_decimal_on):
         self.values[display_index] = value
+        self.right_decimals[display_index] = right_decimal_on
+        self.left_decimals[display_index] = left_decimal_on
         self.left_bits = []
         self.right_bits = []
-        for value in reversed(self.values):
+        for value, left_decimal_on, right_decimal_on in zip(
+                reversed(self.values),
+                reversed(self.left_decimals),
+                reversed(self.right_decimals)):
             if value is not None:
                 left_digit, right_digit = divmod(value, 10)
                 if left_digit == 0:
                     left_digit = None
             else:
                 left_digit, right_digit = None, None
-            self.left_bits.extend(control.DIGITS[left_digit])
-            self.right_bits.extend(control.DIGITS[right_digit])
+            self.left_bits.extend(
+                    control.get_digit_bits(left_digit, left_decimal_on))
+            self.right_bits.extend(
+                    control.get_digit_bits(right_digit, right_decimal_on))
 
     def pulse(self):
         with self.shift_register.latch():

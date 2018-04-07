@@ -7,6 +7,9 @@ from shiftregister import ShiftRegister
 
 
 DISPLAY_COUNT = 3
+# None indicates that no number segments should be shown and False
+# indicates that the right-most decimal should not be lit.
+EMPTY_DISPLAY = (None, False)
 
 
 class DisplayController(object):
@@ -21,7 +24,7 @@ class DisplayController(object):
                 DISPLAY_COUNT, shift_register, control.left_display,
                 control.right_display)
         self._render_thread = threading.Thread(target = self._mainloop)
-        self.values = [None] * DISPLAY_COUNT
+        self.values = [EMPTY_DISPLAY] * DISPLAY_COUNT
 
     def on(self):
         self._render_thread.start()
@@ -31,19 +34,19 @@ class DisplayController(object):
         self._render_thread.join()
 
     def clear_all(self):
-        self.values = [None] * DISPLAY_COUNT
+        self.values = [EMPTY_DISPLAY] * DISPLAY_COUNT
         self.commands.put(('set', list(self.values)))
 
-    def set_inning(self, value):
-        self.values[0] = value
+    def set_inning(self, value, is_bottom=False):
+        self.values[0] = (value, is_bottom)
         self.commands.put(('set', list(self.values)))
 
     def set_top_score(self, value):
-        self.values[2] = value
+        self.values[2] = (value, False)
         self.commands.put(('set', list(self.values)))
 
     def set_bottom_score(self, value):
-        self.values[1] = value
+        self.values[1] = (value, False)
         self.commands.put(('set', list(self.values)))
 
     def _mainloop(self):
@@ -55,8 +58,10 @@ class DisplayController(object):
                 # pulse the display a show loop
                 pass
             if command == 'set':
-                for index, value in enumerate(values):
-                    self.multiplexor.set(index, value)
+                for index, (value, right_decimal) in enumerate(values):
+                    self.multiplexor.set(index, value,
+                            left_decimal_on=False,
+                            right_decimal_on=right_decimal)
             self.multiplexor.pulse()
 
 if __name__ == '__main__':
