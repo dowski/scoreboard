@@ -37,7 +37,7 @@ def main(argv):
     jobs = sched.scheduler(time.time, time.sleep)
     display = DisplayController()
     api = mlb.Api()
-    game_tracker = tracker.GameTracker(jobs, api, display)
+    game_tracker = tracker.GameTracker(team, jobs, api, display)
     game_scheduler = schedule.GameScheduler(jobs, team, game_tracker, api)
 
     print "Starting %s scoreboard" % team

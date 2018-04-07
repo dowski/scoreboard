@@ -18,14 +18,16 @@ RESCHEDULE_DELAY = 30
 class GameTracker(object):
     """Tracks an individual game and renders info on a scoreboard display."""
 
-    def __init__(self, jobs, mlbapi, display):
+    def __init__(self, team, jobs, mlbapi, display):
         """Creates a new GameTracker instance.
 
-        The jobs argument should be a sched.scheduler instance (or compatible
-        object). The mlbapi argument should be a mlb.Api instance. The display
-        should be a DisplayController.
+        The team argument is the name of the team for which we are tracking
+        scores. The jobs argument should be a sched.scheduler instance (or
+        compatible object). The mlbapi argument should be a mlb.Api instance.
+        The display should be a DisplayController.
 
         """
+        self.team = team
         self.jobs = jobs
         self.mlbapi = mlbapi
         self.display = display
@@ -59,10 +61,12 @@ class GameTracker(object):
 
         # Sets the away team score
         self.display.set_top_score(
-                _get_safe_number(game_details.away_team_runs))
+                _get_safe_number(game_details.away_team_runs),
+                is_favorite_team=self.team == game_details.away_team_name)
         # Sets the home team score
         self.display.set_bottom_score(
-                _get_safe_number(game_details.home_team_runs))
+                _get_safe_number(game_details.home_team_runs),
+                is_favorite_team=self.team == game_details.home_team_name)
         # Sets the current inning
         self.display.set_inning(_get_safe_number(game_details.inning),
                 is_bottom=_is_bottom_of_inning(game_details))

@@ -41,12 +41,12 @@ class DisplayController(object):
         self.values[0] = (value, is_bottom)
         self.commands.put(('set', list(self.values)))
 
-    def set_top_score(self, value):
-        self.values[2] = (value, False)
+    def set_top_score(self, value, is_favorite_team=False):
+        self.values[2] = (value, is_favorite_team)
         self.commands.put(('set', list(self.values)))
 
-    def set_bottom_score(self, value):
-        self.values[1] = (value, False)
+    def set_bottom_score(self, value, is_favorite_team=False):
+        self.values[1] = (value, is_favorite_team)
         self.commands.put(('set', list(self.values)))
 
     def _mainloop(self):
