@@ -36,12 +36,16 @@ class Multiplexor(object):
                 reversed(self.values),
                 reversed(self.left_decimals),
                 reversed(self.right_decimals)):
-            if value is not None:
+            if value not in control.SPECIAL_VALUES:
                 left_digit, right_digit = divmod(value, 10)
                 if left_digit == 0:
                     left_digit = None
-            else:
+            elif value is None:
                 left_digit, right_digit = None, None
+            elif value == '-':
+                left_digit, right_digit = value
+            elif value == 'F':
+                left_digit, right_digit = None, value
             self.left_bits.extend(
                     control.get_digit_bits(left_digit, left_decimal_on))
             self.right_bits.extend(

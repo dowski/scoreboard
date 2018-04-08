@@ -83,6 +83,16 @@ def test_track_with_results_game_not_trackable_doesnt_reschedule():
 
     jobs.enter.assert_not_called()
 
+def test_track_with_results_game_over_shows_final_for_inning():
+    team, jobs, mlbapi, display = get_deps()
+    game_details = MagicMock(status=tracker.GAME_OVER)
+    mlbapi.get_game_detail.return_value = game_details
+
+    game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
+    game_tracker.track("foo")
+
+    display.set_inning.assert_called_with("F")
+
 def get_deps():
     team = "Indians"
     jobs = MagicMock()

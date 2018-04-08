@@ -20,9 +20,12 @@ DIGITS = {
     7: [1,1,0,0,1,0,0,0], # 7
     8: [1,1,1,1,1,1,0,1], # 8
     9: [1,1,1,1,1,0,0,0], # 9
-   -1: [0,0,0,1,0,0,0,0], # err
+  '-': [0,0,0,1,0,0,0,0], # -
+  'F': [0,1,1,1,0,1,0,0], # F
  None: [0,0,0,0,0,0,0,0], # blank
 }
+
+SPECIAL_VALUES = set(k for k in DIGITS if type(k) is not int)
 
 # The index of the bit in the DIGITS lists representing the decimal point
 DECIMAL_INDEX = 6
