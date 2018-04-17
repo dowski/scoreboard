@@ -44,8 +44,8 @@ def main(argv):
         display.off()
 
 def show_runs(display, indians, opponent):
-    display.set_top_score(indians)
-    display.set_bottom_score(opponent)
+    display.set_away_runs(indians)
+    display.set_home_runs(opponent)
     display.set_inning(9)
     time.sleep(2)
     display.clear_all()
