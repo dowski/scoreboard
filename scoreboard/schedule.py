@@ -1,6 +1,6 @@
 import datetime
 
-from mlb import FetchError
+from .errors import FetchError
 
 
 TIMEOUT_DELAY = 10

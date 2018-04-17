@@ -2,6 +2,7 @@ import signal
 import urllib2
 
 import mlbgame
+from .errors import FetchError
 
 
 # The number of seconds the code will wait for a response from the MLB API
@@ -54,15 +55,6 @@ class Api(object):
         def handle_alarm(ignored, alsoignored):
             raise _Timeout()
         signal.signal(signal.SIGALRM, handle_alarm)
-
-class FetchError(Exception):
-    """An error that can occur when fetching data from the MLB API.
-
-    Client code might want to retry after a delay in case it was a transient
-    failure.
-
-    """
-    pass
 
 class _Timeout(Exception):
     pass

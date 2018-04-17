@@ -1,4 +1,4 @@
-from mlb import FetchError
+from .errors import FetchError
 
 
 IN_PROGRESS = "In Progress"
