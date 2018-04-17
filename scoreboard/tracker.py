@@ -53,23 +53,28 @@ class GameTracker(object):
             print "rescheduling after error fetching due to", e
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
             return
+
+        home_team_runs = _get_safe_number(game_details.home_team_runs)
+        away_team_runs = _get_safe_number(game_details.away_team_runs)
+        inning = _get_safe_number(game_details.inning)
+
         print "%s: %d, %s: %d, %s of %d" % (game_details.home_team_name,
-                game_details.home_team_runs,
+                home_team_runs,
                 game_details.away_team_name,
-                game_details.away_team_runs,
+                away_team_runs,
                 game_details.inning_state,
-                game_details.inning)
+                inning)
 
         # Sets the away team score
         self.display.set_top_score(
-                _get_safe_number(game_details.away_team_runs),
+                _get_number_or_error_string(away_team_runs),
                 is_favorite_team=self.team == game_details.away_team_name)
         # Sets the home team score
         self.display.set_bottom_score(
-                _get_safe_number(game_details.home_team_runs),
+                _get_number_or_error_string(home_team_runs),
                 is_favorite_team=self.team == game_details.home_team_name)
-        # Sets the current inning
-        self.display.set_inning(_get_safe_number(game_details.inning),
+        self.display.set_inning(
+                _get_number_or_error_string(inning),
                 is_bottom=_is_bottom_of_inning(game_details))
 
         if self.is_trackable(game_details.status):
@@ -87,4 +92,7 @@ def _is_bottom_of_inning(game_details):
     return game_details.inning_state.lower() in ["bottom", "end"]
 
 def _get_safe_number(value):
-    return value if value != '' else 0
+    return value if value != '' else -1
+
+def _get_number_or_error_string(value):
+    return value if value >= 0 else '-'

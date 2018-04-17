@@ -93,6 +93,18 @@ def test_track_with_results_game_over_shows_final_for_inning():
 
     display.set_inning.assert_called_with("F")
 
+def test_track_with_invalid_runs_and_inning_doesnt_fail():
+    game_tracker, display, game_details = get_tracker_display_and_details()
+    game_details.inning = ""
+    game_details.home_team_runs = ""
+    game_details.away_team_runs = ""
+    game_tracker.track("foo")
+
+    display.set_inning.assert_called_once_with('-', is_bottom=ANY)
+    display.set_top_score.assert_called_with('-', is_favorite_team=ANY)
+    display.set_bottom_score.assert_called_with('-', is_favorite_team=ANY)
+
+
 def get_deps():
     team = "Indians"
     jobs = MagicMock()
