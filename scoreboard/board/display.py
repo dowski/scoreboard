@@ -41,11 +41,11 @@ class DisplayController(object):
         self.values[0] = (value, is_bottom)
         self.commands.put(('set', list(self.values)))
 
-    def set_top_score(self, value, is_favorite_team=False):
+    def set_away_runs(self, value, is_favorite_team=False):
         self.values[2] = (value, is_favorite_team)
         self.commands.put(('set', list(self.values)))
 
-    def set_bottom_score(self, value, is_favorite_team=False):
+    def set_home_runs(self, value, is_favorite_team=False):
         self.values[1] = (value, is_favorite_team)
         self.commands.put(('set', list(self.values)))
 
@@ -75,8 +75,8 @@ if __name__ == '__main__':
                     range(100),
                     reversed(range(100)),
                     chain(*zip(range(0,100,2), range(0,100,2)))):
-                dc.set_top_score(a)
-                dc.set_bottom_score(b)
+                dc.set_away_runs(a)
+                dc.set_home_runs(b)
                 dc.set_inning(c)
                 time.sleep(0.1)
     finally:

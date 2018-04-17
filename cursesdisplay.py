@@ -34,10 +34,13 @@ class CursesDisplay():
             elif command == "hide":
                 self._hide()
 
-    def set_left(self, n):
+    def set_away_runs(self, n, is_favorite_team=False):
         self._commands.put(("show", n))
 
-    def set_right(self, n):
+    def set_home_runs(self, n, is_favorite_team=False):
+        pass
+
+    def set_inning(self, n, is_bottom=False):
         pass
 
     def clear_all(self):

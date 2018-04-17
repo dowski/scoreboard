@@ -19,11 +19,11 @@ except ImportError:
             pass
         def off(self):
             pass
-        def set_top_score(self, runs):
+        def set_away_runs(self, runs, is_favorite_team=False):
             pass
-        def set_bottom_score(self, runs):
+        def set_home_runs(self, runs, is_favorite_team=False):
             pass
-        def set_inning(self, inning):
+        def set_inning(self, inning, is_bottom=False):
             pass
 
 

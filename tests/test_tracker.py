@@ -15,8 +15,8 @@ def test_track_with_immediate_network_error_reschedules_and_returns():
     game_tracker.track("foo")
 
     jobs.enter.assert_called_with(tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
-    display.set_top_score.assert_not_called()
-    display.set_bottom_score.assert_not_called()
+    display.set_away_runs.assert_not_called()
+    display.set_home_runs.assert_not_called()
     display.set_inning.assert_not_called()
 
 def test_track_with_results_sets_them_on_the_display():
@@ -24,9 +24,9 @@ def test_track_with_results_sets_them_on_the_display():
     game_details.home_team_name = "Indians"
     game_tracker.track("foo")
 
-    display.set_top_score.assert_called_with(
+    display.set_away_runs.assert_called_with(
             game_details.away_team_runs, is_favorite_team=False)
-    display.set_bottom_score.assert_called_with(
+    display.set_home_runs.assert_called_with(
             game_details.home_team_runs, is_favorite_team=True)
     display.set_inning.assert_called_with(game_details.inning, is_bottom=ANY)
 
@@ -101,8 +101,8 @@ def test_track_with_invalid_runs_and_inning_doesnt_fail():
     game_tracker.track("foo")
 
     display.set_inning.assert_called_once_with('-', is_bottom=ANY)
-    display.set_top_score.assert_called_with('-', is_favorite_team=ANY)
-    display.set_bottom_score.assert_called_with('-', is_favorite_team=ANY)
+    display.set_away_runs.assert_called_with('-', is_favorite_team=ANY)
+    display.set_home_runs.assert_called_with('-', is_favorite_team=ANY)
 
 
 def get_deps():

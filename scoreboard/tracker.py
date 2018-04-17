@@ -66,11 +66,11 @@ class GameTracker(object):
                 inning)
 
         # Sets the away team score
-        self.display.set_top_score(
+        self.display.set_away_runs(
                 _get_number_or_error_string(away_team_runs),
                 is_favorite_team=self.team == game_details.away_team_name)
         # Sets the home team score
-        self.display.set_bottom_score(
+        self.display.set_home_runs(
                 _get_number_or_error_string(home_team_runs),
                 is_favorite_team=self.team == game_details.home_team_name)
         self.display.set_inning(
