@@ -1,7 +1,7 @@
 from mock import MagicMock, ANY
 
 from scoreboard import tracker
-from scoreboard.mlb import FetchError
+from scoreboard.errors import FetchError
 
 
 def test_creating_GameTracker_succeeds():
