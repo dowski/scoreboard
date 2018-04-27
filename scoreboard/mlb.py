@@ -24,10 +24,11 @@ class Api(object):
             signal.alarm(GAME_FETCH_TIMEOUT)
             todays_games = mlbgame.day(date.year, date.month, date.day,
                     home=team, away=team)
-            signal.alarm(0)
             return todays_games
         except (urllib2.URLError, _Timeout) as e:
             raise FetchError()
+        finally:
+            signal.alarm(0)
 
     def get_game_detail(self, game_id):
         """Returns detailed information about a game.
@@ -39,10 +40,11 @@ class Api(object):
         try:
             signal.alarm(GAME_FETCH_TIMEOUT)
             game_details = mlbgame.overview(game_id)
-            signal.alarm(0)
             return game_details
         except (urllib2.URLError, _Timeout) as e:
             raise FetchError()
+        finally:
+            signal.alarm(0)
 
     @staticmethod
     def install_alarm_handler():
