@@ -50,7 +50,8 @@ class GameTracker(object):
         try:
             game_details = self.mlbapi.get_game_detail(game_id)
         except FetchError as e:
-            print "rescheduling after error fetching due to", e
+            print "rescheduling tracker; error fetching due to {}".format(
+                    e.original_exception)
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
             return
 

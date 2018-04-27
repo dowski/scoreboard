@@ -25,8 +25,10 @@ class Api(object):
             todays_games = mlbgame.day(date.year, date.month, date.day,
                     home=team, away=team)
             return todays_games
-        except (urllib2.URLError, _Timeout) as e:
-            raise FetchError()
+        except (urllib2.URLError, _Timeout, ValueError) as e:
+            # mlbgame returns ValueError for any HTTPError, so we treat it as
+            # a retryable error here
+            raise FetchError(e)
         finally:
             signal.alarm(0)
 
@@ -41,8 +43,10 @@ class Api(object):
             signal.alarm(GAME_FETCH_TIMEOUT)
             game_details = mlbgame.overview(game_id)
             return game_details
-        except (urllib2.URLError, _Timeout) as e:
-            raise FetchError()
+        except (urllib2.URLError, _Timeout, ValueError) as e:
+            # mlbgame returns ValueError for any HTTPError, so we treat it as
+            # a retryable error here
+            raise FetchError(e)
         finally:
             signal.alarm(0)
 

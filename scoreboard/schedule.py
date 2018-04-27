@@ -40,7 +40,8 @@ class GameScheduler(object):
         try:
             todays_games = self.mlbapi.get_games(now, self.team)
         except FetchError as e:
-            print "failed to fetch games - will try again"
+            print ("rescheduling get_games after error fetching "
+                    "due to {}").format(e.original_exception)
             self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
             return
         print "%d games today" % len(todays_games)
@@ -59,7 +60,8 @@ class GameScheduler(object):
                     if self.tracker.is_trackable(game_details.status):
                         self.tracker.track(game.game_id)
                 except FetchError as e:
-                    print "failed to fetch games - will try again"
+                    print ("rescheduling get_game_detail after error fetching "
+                            "due to {}").format(e.original_exception)
                     self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
                     return
             else:

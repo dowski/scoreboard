@@ -7,5 +7,7 @@ class FetchError(Exception):
     failure.
 
     """
-    pass
+
+    def __init__(self, original):
+        self.original_exception = original
 

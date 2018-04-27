@@ -9,7 +9,7 @@ def test_creating_GameTracker_succeeds():
 
 def test_track_with_immediate_network_error_reschedules_and_returns():
     team, jobs, mlbapi, display = get_deps()
-    mlbapi.get_game_detail.side_effect = FetchError
+    mlbapi.get_game_detail.side_effect = FetchError(original=None)
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
     game_tracker.track("foo")
