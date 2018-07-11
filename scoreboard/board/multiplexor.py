@@ -1,6 +1,6 @@
 import time
 
-import control
+from . import control
 
 
 class Multiplexor(object):

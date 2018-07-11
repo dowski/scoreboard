@@ -1,10 +1,14 @@
 import threading
-import Queue
 
-import control
-from inning import InningDisplay
-from multiplexor import Multiplexor
-from shiftregister import ShiftRegister
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
+from . import control
+from .inning import InningDisplay
+from .multiplexor import Multiplexor
+from .shiftregister import ShiftRegister
 
 
 DISPLAY_COUNT = 3
@@ -18,7 +22,7 @@ class DisplayController(object):
 
     """
     def __init__(self):
-        self.commands = Queue.Queue()
+        self.commands = queue.Queue()
         shift_register = ShiftRegister(
                 control.data, control.clk, control.latch)
         self.multiplexor = Multiplexor(
@@ -68,7 +72,7 @@ class DisplayController(object):
         while command != 'stop':
             try:
                 command, values = self.commands.get(False)
-            except Queue.Empty:
+            except queue.Empty:
                 # pulse the display a show loop
                 pass
             if command == 'set':
