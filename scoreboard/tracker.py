@@ -54,8 +54,8 @@ class GameTracker(object):
         try:
             game_details = self.mlbapi.get_game_detail(game_id)
         except FetchError as e:
-            print "rescheduling tracker; error fetching due to {}".format(
-                    e.original_exception)
+            print("rescheduling tracker; error fetching due to {}".format(
+                    e.original_exception))
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
             return
 
@@ -72,7 +72,7 @@ class GameTracker(object):
                 strikes=_get_safe_number(game_details.strikes, 0),
                 outs=_get_safe_number(game_details.outs, 0))
 
-        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d)" % (
+        print("%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d)" % (
                 game_details.home_team_name,
                 game_state.score.home,
                 game_details.away_team_name,
@@ -81,7 +81,7 @@ class GameTracker(object):
                 game_state.inning.number,
                 game_state.balls,
                 game_state.strikes,
-                game_state.outs)
+                game_state.outs))
 
         render_state = game_state.derived_state
         self.display.set_away_runs(
@@ -103,7 +103,7 @@ class GameTracker(object):
             if game_details.status in [GAME_OVER, FINAL] \
                     or render_state.is_over:
                 self.display.set_inning("F")
-            print "game no longer trackable, status:", game_details.status
+            print("game no longer trackable, status:", game_details.status)
 
     @staticmethod
     def is_trackable(game_state, status):

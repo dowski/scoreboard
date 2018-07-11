@@ -1,5 +1,8 @@
 import signal
-import urllib2
+try:
+    from urllib2 import URLError
+except ImportError:
+    from urllib.error import URLError
 
 import mlbgame
 from .errors import FetchError
@@ -25,7 +28,7 @@ class Api(object):
             todays_games = mlbgame.day(date.year, date.month, date.day,
                     home=team, away=team)
             return todays_games
-        except (urllib2.URLError, _Timeout, ValueError) as e:
+        except (URLError, _Timeout, ValueError) as e:
             # mlbgame returns ValueError for any HTTPError, so we treat it as
             # a retryable error here
             raise FetchError(e)
@@ -43,7 +46,7 @@ class Api(object):
             signal.alarm(GAME_FETCH_TIMEOUT)
             game_details = mlbgame.overview(game_id)
             return game_details
-        except (urllib2.URLError, _Timeout, ValueError) as e:
+        except (URLError, _Timeout, ValueError) as e:
             # mlbgame returns ValueError for any HTTPError, so we treat it as
             # a retryable error here
             raise FetchError(e)

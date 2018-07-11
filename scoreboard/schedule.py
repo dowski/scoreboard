@@ -40,11 +40,11 @@ class GameScheduler(object):
         try:
             todays_games = self.mlbapi.get_games(now, self.team)
         except FetchError as e:
-            print ("rescheduling get_games after error fetching "
-                    "due to {}").format(e.original_exception)
+            print(("rescheduling get_games after error fetching "
+                    "due to {}").format(e.original_exception))
             self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
             return
-        print "%d games today" % len(todays_games)
+        print("%d games today" % len(todays_games))
         for game in todays_games:
             # hack the start time until my PR is accepted
             year, month, day = game.game_id.split('_')[:3]
@@ -59,21 +59,21 @@ class GameScheduler(object):
                     game_details = self.mlbapi.get_game_detail(game.game_id)
                     self.tracker.track(game.game_id)
                 except FetchError as e:
-                    print ("rescheduling get_game_detail after error fetching "
-                            "due to {}").format(e.original_exception)
+                    print(("rescheduling get_game_detail after error fetching "
+                            "due to {}").format(e.original_exception))
                     self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
                     return
             else:
                 wait_game = (start_time - datetime.datetime.now()).seconds
-                print ("Tracking for today's game (%s) will start at "
+                print(("Tracking for today's game (%s) will start at "
                         "%s (%d seconds from now)") % (
-                                game.game_id, _format_time(start_time), wait_game)
+                                game.game_id, _format_time(start_time), wait_game))
                 self.jobs.enter(wait_game, 0, self.tracker.track, (game.game_id,))
         next_day = (now + datetime.timedelta(days=1)).replace(
                 hour=8, minute=0, second=0, microsecond=0)
         wait_tomorrow = (next_day - datetime.datetime.now()).total_seconds()
-        print "Checking tomorrow's schedule at %s (%d seconds from now)" % (
-                _format_time(next_day), wait_tomorrow)
+        print("Checking tomorrow's schedule at %s (%d seconds from now)" % (
+                _format_time(next_day), wait_tomorrow))
         self.jobs.enter(wait_tomorrow, 0, self.run, ())
 
 def _format_time(dt):

@@ -2,9 +2,9 @@ import datetime
 import sched
 import time
 
-import mlb
-import schedule
-import tracker
+from . import mlb
+from . import schedule
+from . import tracker
 
 
 DEFAULT_TEAM = "Indians"
@@ -42,7 +42,7 @@ def main(argv):
     game_tracker = tracker.GameTracker(team, jobs, api, display)
     game_scheduler = schedule.GameScheduler(jobs, team, game_tracker, api)
 
-    print "Starting %s scoreboard" % team
+    print("Starting %s scoreboard" % team)
     display.on()
     jobs.enter(0, 0, game_scheduler.run, ())
     try:
