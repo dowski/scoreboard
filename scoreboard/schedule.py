@@ -57,8 +57,7 @@ class GameScheduler(object):
                 # game already started
                 try:
                     game_details = self.mlbapi.get_game_detail(game.game_id)
-                    if self.tracker.is_trackable(game_details.status):
-                        self.tracker.track(game.game_id)
+                    self.tracker.track(game.game_id)
                 except FetchError as e:
                     print ("rescheduling get_game_detail after error fetching "
                             "due to {}").format(e.original_exception)

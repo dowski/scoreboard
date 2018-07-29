@@ -11,6 +11,7 @@ CHALLENGE = "Manager Challenge"
 REPLAY = "Replay"
 REVIEW = "Review"
 GAME_OVER = "Game Over"
+FINAL = "Final"
 TRACKABLE_STATUSES = set([
     IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, CHALLENGE, REPLAY, REVIEW])
 RESCHEDULE_DELAY = 30
@@ -81,7 +82,7 @@ class GameTracker(object):
         if self.is_trackable(game_details.status):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
         else:
-            if game_details.status == GAME_OVER:
+            if game_details.status in [GAME_OVER, FINAL]:
                 self.display.set_inning("F")
             print "game no longer trackable, status:", game_details.status
 
