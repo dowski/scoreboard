@@ -38,10 +38,6 @@ pytest and run the tests.
 python setup.py test
 ```
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
 ## Built With
 
 * [mlbgame](http://panz.io/mlbgame/) - Library for accessing MLB game data
@@ -49,7 +45,7 @@ Add additional notes about how to deploy this on a live system
 
 ## Authors
 
-* **Christian Wyglendowski** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Christian Wyglendowski** 
 
 ## License
 
