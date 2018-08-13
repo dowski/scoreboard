@@ -21,6 +21,7 @@ REQUIRED = [
 
 REQUIRED_FOR_TESTS = [
     'pytest',
+    'mock',
 ]
 
 REQUIRED_FOR_SETUP = [
