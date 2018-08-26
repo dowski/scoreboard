@@ -51,6 +51,12 @@ latch = LED(15)
 left_display = LED(23, initial_value=False)
 right_display = LED(24, initial_value=False)
 
+# Inning Display Pins
+# -------------------
+inning_data_pin = 2
+inning_latch_pin = 3
+inning_clk_pin = 4
+
 def get_digit_bits(value, include_decimal_bit):
     digit_bits = DIGITS[value][:]
     if include_decimal_bit:

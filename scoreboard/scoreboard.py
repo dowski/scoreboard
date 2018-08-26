@@ -25,6 +25,8 @@ except ImportError:
             pass
         def set_inning(self, inning, is_bottom=False):
             pass
+        def set_inning_state(self, balls, strikes, outs):
+            pass
 
 
 def main(argv):

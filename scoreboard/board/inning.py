@@ -1,4 +1,4 @@
-from scoreboard.board.shiftregister import ShiftRegister
+from .shiftregister import ShiftRegister
 from gpiozero import LED
 
 # The key is the number of balls, the value is the bits to set
@@ -7,6 +7,7 @@ BALL_SLICES = {
     1: [0,0,1],
     2: [0,1,1],
     3: [1,1,1],
+    4: [1,1,1],
 }
 
 # The key is the number of strikes/outs, the value is the bits to set
@@ -14,6 +15,7 @@ STRIKE_AND_OUT_SLICES = {
     0: [0,0],
     1: [0,1],
     2: [1,1],
+    3: [1,1],
 }
 
 class InningState(object):

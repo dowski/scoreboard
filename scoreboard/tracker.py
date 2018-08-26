@@ -59,26 +59,34 @@ class GameTracker(object):
         home_team_runs = _get_safe_number(game_details.home_team_runs)
         away_team_runs = _get_safe_number(game_details.away_team_runs)
         inning = _get_safe_number(game_details.inning)
+        balls = _get_safe_number(game_details.balls, 0)
+        strikes = _get_safe_number(game_details.strikes, 0)
+        outs = _get_safe_number(game_details.outs, 0)
 
-        print "%s: %d, %s: %d, %s of %d" % (game_details.home_team_name,
+        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d" % (
+                game_details.home_team_name,
                 home_team_runs,
                 game_details.away_team_name,
                 away_team_runs,
                 game_details.inning_state,
-                inning)
+                inning,
+                balls,
+                strikes,
+                outs)
 
-        # Sets the away team score
         self.display.set_away_runs(
                 _get_number_or_error_string(away_team_runs),
                 is_favorite_team=self.team == game_details.away_team_name)
-        # Sets the home team score
         self.display.set_home_runs(
                 _get_number_or_error_string(home_team_runs),
                 is_favorite_team=self.team == game_details.home_team_name)
         self.display.set_inning(
                 _get_number_or_error_string(inning),
                 is_bottom=_is_bottom_of_inning(game_details))
-
+        self.display.set_inning_state(
+                balls=_get_safe_number(game_details.balls, 0),
+                strikes=_get_safe_number(game_details.strikes, 0),
+                outs=_get_safe_number(game_details.outs, 0))
         if self.is_trackable(game_details.status):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
         else:
@@ -93,8 +101,8 @@ class GameTracker(object):
 def _is_bottom_of_inning(game_details):
     return game_details.inning_state.lower() in ["bottom", "end"]
 
-def _get_safe_number(value):
-    return value if value != '' else -1
+def _get_safe_number(value, default=-1):
+    return value if value != '' else default
 
 def _get_number_or_error_string(value):
     return value if value >= 0 else '-'
