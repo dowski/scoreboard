@@ -1,4 +1,5 @@
 from .errors import FetchError
+from .gamestate import GameState, Inning, Score
 
 
 IN_PROGRESS = "In Progress"
@@ -56,37 +57,44 @@ class GameTracker(object):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
             return
 
-        home_team_runs = _get_safe_number(game_details.home_team_runs)
-        away_team_runs = _get_safe_number(game_details.away_team_runs)
-        inning = _get_safe_number(game_details.inning)
-        balls = _get_safe_number(game_details.balls, 0)
-        strikes = _get_safe_number(game_details.strikes, 0)
-        outs = _get_safe_number(game_details.outs, 0)
-
-        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d" % (
-                game_details.home_team_name,
-                home_team_runs,
-                game_details.away_team_name,
-                away_team_runs,
-                game_details.inning_state,
-                inning,
-                balls,
-                strikes,
-                outs)
-
-        self.display.set_away_runs(
-                _get_number_or_error_string(away_team_runs),
-                is_favorite_team=self.team == game_details.away_team_name)
-        self.display.set_home_runs(
-                _get_number_or_error_string(home_team_runs),
-                is_favorite_team=self.team == game_details.home_team_name)
-        self.display.set_inning(
-                _get_number_or_error_string(inning),
-                is_bottom=_is_bottom_of_inning(game_details))
-        self.display.set_inning_state(
+        if _is_bottom_of_inning(game_details):
+            inning = Inning.bottom.of(_get_safe_number(game_details.inning))
+        else:
+            inning = Inning.top.of(_get_safe_number(game_details.inning))
+        game_state = GameState(
+                inning=inning,
+                score=Score(
+                    home=_get_safe_number(game_details.home_team_runs),
+                    away=_get_safe_number(game_details.away_team_runs)),
                 balls=_get_safe_number(game_details.balls, 0),
                 strikes=_get_safe_number(game_details.strikes, 0),
                 outs=_get_safe_number(game_details.outs, 0))
+
+        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d" % (
+                game_details.home_team_name,
+                game_state.score.home,
+                game_details.away_team_name,
+                game_state.score.away,
+                game_details.inning_state,
+                game_state.inning.number,
+                game_state.balls,
+                game_state.strikes,
+                game_state.outs)
+
+        render_state = game_state.derived_state
+        self.display.set_away_runs(
+                _get_number_or_error_string(render_state.score.away),
+                is_favorite_team=self.team == game_details.away_team_name)
+        self.display.set_home_runs(
+                _get_number_or_error_string(render_state.score.home),
+                is_favorite_team=self.team == game_details.home_team_name)
+        self.display.set_inning(
+                _get_number_or_error_string(render_state.inning.number),
+                is_bottom=render_state.inning.half == Inning.BOTTOM)
+        self.display.set_inning_state(
+                balls=render_state.balls,
+                strikes=render_state.strikes,
+                outs=render_state.outs)
         if self.is_trackable(game_details.status):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
         else:

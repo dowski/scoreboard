@@ -29,6 +29,10 @@ def test_track_with_results_sets_them_on_the_display():
     display.set_home_runs.assert_called_with(
             game_details.home_team_runs, is_favorite_team=True)
     display.set_inning.assert_called_with(game_details.inning, is_bottom=ANY)
+    display.set_inning_state.assert_called_with(
+            balls=game_details.balls,
+            strikes=game_details.strikes,
+            outs=game_details.outs)
 
 def test_track_top_of_inning_handling():
     game_tracker, display, game_details = get_tracker_display_and_details()

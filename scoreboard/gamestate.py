@@ -15,6 +15,7 @@ Inning = collections.namedtuple("Inning", ["number", "half"])
 Inning.TOP = "top"
 Inning.BOTTOM = "bottom"
 
+
 class InningBuilder:
     def __init__(self, half):
         self.half = half
@@ -22,23 +23,39 @@ class InningBuilder:
     def of(self, number):
         return Inning(number, self.half)
 
-top = InningBuilder(Inning.TOP)
-bottom = InningBuilder(Inning.BOTTOM)
+
+_top = Inning.top = InningBuilder(Inning.TOP)
+_bottom = Inning.bottom = InningBuilder(Inning.BOTTOM)
+
+
+Score = collections.namedtuple("Score", ["home", "away"])
+
 
 class GameState(object):
-    def __init__(self, inning=top.of(1), balls=0, strikes=0, outs=0):
+    def __init__(
+            self,
+            inning=_top.of(1),
+            balls=0,
+            strikes=0,
+            outs=0,
+            score=Score(0, 0)):
         self.inning = inning
         self.balls = balls
         self.strikes = strikes
         self.outs = outs
+        self.score = score
 
     def next_inning(self):
         if self.inning.half == Inning.TOP:
-            return GameState(inning=bottom.of(self.inning.number))
-        return GameState(inning=top.of(self.inning.number + 1))
+            return GameState(
+                    inning=_bottom.of(self.inning.number),
+                    score=self.score)
+        return GameState(
+                inning=_top.of(self.inning.number + 1),
+                score=self.score)
 
     def next_batter(self):
-        return GameState(inning=self.inning, outs=self.outs)
+        return GameState(inning=self.inning, outs=self.outs, score=self.score)
 
     @property
     def derived_state(self):
