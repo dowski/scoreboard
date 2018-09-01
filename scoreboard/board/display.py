@@ -26,12 +26,15 @@ class DisplayController(object):
                 control.right_display)
         self._render_thread = threading.Thread(target = self._mainloop)
         self.values = [EMPTY_DISPLAY] * DISPLAY_COUNT
-        self.inning_state = InningDisplay(
+        self.inning_display = InningDisplay(
                 control.inning_data_pin,
                 control.inning_clk_pin,
                 control.inning_latch_pin)
 
     def on(self):
+        # This update() call is needed to make sure the inning display starts
+        # in an "off" state.
+        self.inning_display.update()
         self._render_thread.start()
 
     def off(self):
@@ -55,10 +58,10 @@ class DisplayController(object):
         self.commands.put(('set', list(self.values)))
 
     def set_inning_state(self, balls, strikes, outs):
-        self.inning_state.balls = balls
-        self.inning_state.strikes = strikes
-        self.inning_state.outs = outs
-        self.inning_state.update()
+        self.inning_display.balls = balls
+        self.inning_display.strikes = strikes
+        self.inning_display.outs = outs
+        self.inning_display.update()
 
     def _mainloop(self):
         command, values = None, []
