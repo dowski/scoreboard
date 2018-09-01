@@ -18,7 +18,7 @@ STRIKE_AND_OUT_SLICES = {
     3: [1,1],
 }
 
-class InningState(object):
+class InningDisplay(object):
     """Renders important data about the current inning to an LED display.
 
     The data in question are the balls, strikes and outs count for the current
@@ -45,13 +45,13 @@ class InningState(object):
             self.register.shift_out(bits)
 
     def __repr__(self):
-        return "InningState(balls=%d, strikes=%d, outs=%d)" % (
+        return "InningDisplay(balls=%d, strikes=%d, outs=%d)" % (
                 self.balls, self.strikes, self.outs)
 
 
 if __name__ == '__main__':
     import random
-    inning = InningState(data_pin_num=14, clock_pin_num=18, latch_pin_num=15)
+    inning = InningDisplay(data_pin_num=14, clock_pin_num=18, latch_pin_num=15)
     while True:
         inning.balls = random.randint(0,3)
         inning.strikes = random.randint(0,2)

@@ -2,7 +2,7 @@ import threading
 import Queue
 
 import control
-from inning import InningState
+from inning import InningDisplay
 from multiplexor import Multiplexor
 from shiftregister import ShiftRegister
 
@@ -26,7 +26,7 @@ class DisplayController(object):
                 control.right_display)
         self._render_thread = threading.Thread(target = self._mainloop)
         self.values = [EMPTY_DISPLAY] * DISPLAY_COUNT
-        self.inning_state = InningState(
+        self.inning_state = InningDisplay(
                 control.inning_data_pin,
                 control.inning_clk_pin,
                 control.inning_latch_pin)
