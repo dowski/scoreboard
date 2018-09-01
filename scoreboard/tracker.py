@@ -70,7 +70,7 @@ class GameTracker(object):
                 strikes=_get_safe_number(game_details.strikes, 0),
                 outs=_get_safe_number(game_details.outs, 0))
 
-        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d" % (
+        print "%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d)" % (
                 game_details.home_team_name,
                 game_state.score.home,
                 game_details.away_team_name,
