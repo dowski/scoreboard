@@ -40,6 +40,14 @@ class GameState(object):
     def next_batter(self):
         return GameState(inning=self.inning, outs=self.outs)
 
+    @property
+    def derived_state(self):
+        if self.outs == 3:
+            return self.next_inning()
+        if self.strikes == 3 or self.balls == 4:
+            return self.next_batter()
+        return self
+
     def __eq__(self, other):
         return self.inning == other.inning \
                 and self.balls == other.balls \
@@ -49,24 +57,3 @@ class GameState(object):
     def __repr__(self):
         return "GameState(inning=%s, balls=%d, strikes=%d, outs=%d)" % (
                 self.inning, self.balls, self.strikes, self.outs)
-
-class GameLog:
-    def __init__(self):
-        self.entries = [GameState()]
-
-    def add(self, state):
-        self.entries.append(state)
-
-    @property
-    def last_state(self):
-        return self.entries[-1]
-
-    @property
-    def derived_state(self):
-        last_state = self.entries[-1]
-        if last_state.outs == 3:
-            return last_state.next_inning()
-        if last_state.strikes == 3 or last_state.balls == 4:
-            return last_state.next_batter()
-        return last_state
-
