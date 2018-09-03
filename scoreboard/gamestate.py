@@ -12,8 +12,8 @@ import collections
 
 
 Inning = collections.namedtuple("Inning", ["number", "half"])
-Inning.TOP = "top"
-Inning.BOTTOM = "bottom"
+Inning.TOP = "Top"
+Inning.BOTTOM = "Bottom"
 
 
 class InningBuilder:
@@ -59,18 +59,37 @@ class GameState(object):
 
     @property
     def derived_state(self):
+        if self.is_over:
+            return self
         if self.outs == 3:
             return self.next_inning()
         if self.strikes == 3 or self.balls == 4:
             return self.next_batter()
         return self
 
+    @property
+    def is_over(self):
+        return (self.inning.number >= 9 \
+                and self.inning.half == Inning.BOTTOM \
+                and self.score.home > self.score.away) \
+                or \
+                (self.inning.number >= 9 \
+                and self.inning.half == Inning.BOTTOM \
+                and self.outs == 3 \
+                and self.score.away > self.score.home)
+
+
     def __eq__(self, other):
         return self.inning == other.inning \
                 and self.balls == other.balls \
                 and self.strikes == other.strikes \
-                and self.outs == other.outs
+                and self.outs == other.outs \
+                and self.score == other.score
 
     def __repr__(self):
-        return "GameState(inning=%s, balls=%d, strikes=%d, outs=%d)" % (
-                self.inning, self.balls, self.strikes, self.outs)
+        return "GameState(%s of %d, balls=%d, strikes=%d, outs=%d)" % (
+                self.inning.half,
+                self.inning.number,
+                self.balls,
+                self.strikes,
+                self.outs)

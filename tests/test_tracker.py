@@ -97,6 +97,17 @@ def test_track_with_results_game_over_shows_final_for_inning():
 
     display.set_inning.assert_called_with("F")
 
+def test_track_with_gamestate_is_over_shows_final_for_inning():
+    game_tracker, display, game_details = get_tracker_display_and_details()
+    game_details.inning = 9
+    game_details.inning_state = "End"
+    game_details.home_team_runs = 2
+    game_details.away_team_runs = 1
+
+    game_tracker.track("foo")
+
+    display.set_inning.assert_called_with("F")
+
 def test_track_with_invalid_runs_and_inning_doesnt_fail():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning = ""

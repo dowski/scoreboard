@@ -95,16 +95,17 @@ class GameTracker(object):
                 balls=render_state.balls,
                 strikes=render_state.strikes,
                 outs=render_state.outs)
-        if self.is_trackable(game_details.status):
+        if self.is_trackable(render_state, game_details.status):
             self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
         else:
-            if game_details.status in [GAME_OVER, FINAL]:
+            if game_details.status in [GAME_OVER, FINAL] \
+                    or render_state.is_over:
                 self.display.set_inning("F")
             print "game no longer trackable, status:", game_details.status
 
     @staticmethod
-    def is_trackable(status):
-        return status in TRACKABLE_STATUSES
+    def is_trackable(game_state, status):
+        return not game_state.is_over and status in TRACKABLE_STATUSES
 
 def _is_bottom_of_inning(game_details):
     return game_details.inning_state.lower() in ["bottom", "end"]
