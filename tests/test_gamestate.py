@@ -41,6 +41,9 @@ def test_derived_state_home_team_in_lead_after_top_of_ninth_is_over():
             outs=3,
             score=Score(home=1, away=0))
     assert state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 
 def test_derived_state_home_team_in_lead_in_end_of_eight_is_not_over():
     state = gamestate.GameState(
@@ -50,6 +53,9 @@ def test_derived_state_home_team_in_lead_in_end_of_eight_is_not_over():
             outs=3,
             score=Score(home=4, away=2))
     assert not state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 
 def test_derived_state_home_team_takes_lead_in_bottom_of_ninth_is_over():
     state = gamestate.GameState(
@@ -59,6 +65,9 @@ def test_derived_state_home_team_takes_lead_in_bottom_of_ninth_is_over():
             outs=1,
             score=Score(home=4, away=2))
     assert state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 
 def test_derived_state_afer_nine_tied_goes_to_extras():
     state = gamestate.GameState(
@@ -72,6 +81,9 @@ def test_derived_state_afer_nine_tied_goes_to_extras():
             score=Score(home=1, away=1))
     assert state.derived_state == expected
     assert not state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 
 def test_derived_state_after_away_up_in_top_of_extra_innings_goes_to_bottom():
     state = gamestate.GameState(
@@ -85,6 +97,9 @@ def test_derived_state_after_away_up_in_top_of_extra_innings_goes_to_bottom():
             score=Score(home=1, away=2))
     assert state.derived_state == expected
     assert not state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 
 def test_derived_state_home_team_losing_after_nine_is_over():
     state = gamestate.GameState(
@@ -94,4 +109,7 @@ def test_derived_state_home_team_losing_after_nine_is_over():
             outs=3,
             score=Score(home=1, away=5))
     assert state.derived_state.is_over
+    assert state.derived_state.balls == 0
+    assert state.derived_state.strikes == 0
+    assert state.derived_state.outs == 0
 

@@ -38,12 +38,14 @@ class GameState(object):
             balls=0,
             strikes=0,
             outs=0,
-            score=Score(0, 0)):
+            score=Score(0, 0),
+            final=False):
         self.inning = inning
         self.balls = balls
         self.strikes = strikes
         self.outs = outs
         self.score = score
+        self.final = final
 
     def next_inning(self):
         if self.inning.half == Inning.TOP:
@@ -60,7 +62,7 @@ class GameState(object):
     @property
     def derived_state(self):
         if self.is_over:
-            return self
+            return GameState(inning=self.inning, score=self.score, final=True)
         if self.outs == 3:
             return self.next_inning()
         if self.strikes == 3 or self.balls == 4:
@@ -69,11 +71,11 @@ class GameState(object):
 
     @property
     def is_over(self):
-        return (self.inning.number >= 9 \
+        return self.final \
+                or (self.inning.number >= 9 \
                 and self.inning.half == Inning.BOTTOM \
                 and self.score.home > self.score.away) \
-                or \
-                (self.inning.number >= 9 \
+                or (self.inning.number >= 9 \
                 and self.inning.half == Inning.BOTTOM \
                 and self.outs == 3 \
                 and self.score.away > self.score.home)
