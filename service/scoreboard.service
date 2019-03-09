@@ -1,0 +1,14 @@
+[Unit]
+Description=scoreboard
+After=syslog.target network.target
+
+[Service]
+Type=idle
+User=pi
+WorkingDirectory=/home/pi/src/scoreboard
+ExecStart=/home/pi/src/scoreboard/env/bin/python -u -m scoreboard.scoreboard
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
