@@ -77,6 +77,17 @@ def test_track_with_results_game_trackable_reschedules():
     jobs.enter.assert_called_with(
             tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
 
+def test_track_with_results_manager_challenge_reschedules():
+    team, jobs, mlbapi, display = get_deps()
+    game_details = MagicMock(status=tracker.CHALLENGE_PREFIX + " whatever")
+    mlbapi.get_game_detail.return_value = game_details
+
+    game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
+    game_tracker.track("foo")
+
+    jobs.enter.assert_called_with(
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+
 def test_track_with_results_game_not_trackable_doesnt_reschedule():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.CANCELLED)

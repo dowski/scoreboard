@@ -8,13 +8,13 @@ FINAL = "Final"
 CANCELLED = "Cancelled"
 DELAYED = "Delayed"
 DELAYED_START = "Delayed Start"
-CHALLENGE = "Manager Challenge"
 REPLAY = "Replay"
 REVIEW = "Review"
 GAME_OVER = "Game Over"
 FINAL = "Final"
+CHALLENGE_PREFIX = "Manager challenge:"
 TRACKABLE_STATUSES = set([
-    IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, CHALLENGE, REPLAY, REVIEW])
+    IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, REPLAY, REVIEW])
 RESCHEDULE_DELAY = 30
 
 
@@ -105,7 +105,8 @@ class GameTracker(object):
 
     @staticmethod
     def is_trackable(game_state, status):
-        return not game_state.is_over and status in TRACKABLE_STATUSES
+        return not game_state.is_over and (
+                status in TRACKABLE_STATUSES or status.startswith(CHALLENGE_PREFIX))
 
 def _is_bottom_of_inning(game_details):
     return game_details.inning_state.lower() in ["bottom", "end"]
