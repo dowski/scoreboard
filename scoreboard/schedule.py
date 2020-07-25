@@ -1,4 +1,5 @@
 import datetime
+import dateutil.tz
 
 from .errors import FetchError
 
@@ -36,27 +37,21 @@ class GameScheduler(object):
         scoreboard.
 
         """
-        now = datetime.datetime.now()
         try:
-            todays_games = self.mlbapi.get_games(now, self.team)
+            todays_games = self.mlbapi.get_games(
+                    datetime.date.today(), self.team)
         except FetchError as e:
             print(("rescheduling get_games after error fetching "
                     "due to {}").format(e.original_exception))
             self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
             return
         print("%d games today" % len(todays_games))
+        now = datetime.datetime.now(dateutil.tz.UTC)
         for game in todays_games:
-            # hack the start time until my PR is accepted
-            year, month, day = game.game_id.split('_')[:3]
-            game_start_date = "/".join([year, month, day])
-            start_time = datetime.datetime.strptime(
-                   " ".join([game_start_date,
-                        game.game_start_time.replace(' ', '')]),
-                   "%Y/%m/%d %I:%M%p")
-            if start_time <= now:
+            if game.start_time <= now:
                 # game already started
                 try:
-                    game_details = self.mlbapi.get_game_detail(game.game_id)
+                    self.mlbapi.get_game_detail(game.game_id)
                     self.tracker.track(game.game_id)
                 except FetchError as e:
                     print(("rescheduling get_game_detail after error fetching "
@@ -64,16 +59,24 @@ class GameScheduler(object):
                     self.jobs.enter(TIMEOUT_DELAY, 0, self.run, ())
                     return
             else:
-                wait_game = (start_time - datetime.datetime.now()).seconds
+                wait_game = (
+                        game.start_time - datetime.datetime.now(
+                            dateutil.tz.UTC)).seconds
                 print(("Tracking for today's game (%s) will start at "
                         "%s (%d seconds from now)") % (
-                                game.game_id, _format_time(start_time), wait_game))
-                self.jobs.enter(wait_game, 0, self.tracker.track, (game.game_id,))
-        next_day = (now + datetime.timedelta(days=1)).replace(
-                hour=8, minute=0, second=0, microsecond=0)
+                                game.game_id, _format_time(game.start_time),
+                                wait_game))
+                self.jobs.enter(
+                        wait_game, 0, self.tracker.track, (game.game_id,))
+        # Naive timezone-less datetime instances are used here to check the schedule
+        # at 8:00 AM local time the next day.
+        next_day = (datetime.datetime.now()
+                + datetime.timedelta(days=1)).replace(
+                        hour=8, minute=0, second=0, microsecond=0)
         wait_tomorrow = (next_day - datetime.datetime.now()).total_seconds()
         print("Checking tomorrow's schedule at %s (%d seconds from now)" % (
-                _format_time(next_day), wait_tomorrow))
+                _format_time(next_day.replace(tzinfo=dateutil.tz.tzlocal())),
+                    wait_tomorrow))
         self.jobs.enter(wait_tomorrow, 0, self.run, ())
 
 def _format_time(dt):
