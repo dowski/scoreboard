@@ -13,20 +13,23 @@ DEFAULT_TEAM = "Indians"
 try:
     from board.display import DisplayController
 except ImportError:
-    # The scoreboard hardware interface isn't available - stub it out
-    class DisplayController:
-        def on(self):
-            pass
-        def off(self):
-            pass
-        def set_away_runs(self, runs, is_favorite_team=False):
-            pass
-        def set_home_runs(self, runs, is_favorite_team=False):
-            pass
-        def set_inning(self, inning, is_bottom=False):
-            pass
-        def set_inning_state(self, balls, strikes, outs):
-            pass
+    try:
+        from bigboard.display import DisplayController
+    except ImportError:
+        # The scoreboard hardware interface isn't available - stub it out
+        class DisplayController:
+            def on(self):
+                pass
+            def off(self):
+                pass
+            def set_away_runs(self, runs, is_favorite_team=False):
+                pass
+            def set_home_runs(self, runs, is_favorite_team=False):
+                pass
+            def set_inning(self, inning, is_bottom=False):
+                pass
+            def set_inning_state(self, balls, strikes, outs):
+                pass
 
 
 def main(argv):
