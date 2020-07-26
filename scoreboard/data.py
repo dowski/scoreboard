@@ -4,7 +4,7 @@ from collections import namedtuple
 
 
 GameDetails = namedtuple('GameDetails', [
-    'inning'
+    'inning',
     'home_team_runs',
     'away_team_runs',
     'balls',

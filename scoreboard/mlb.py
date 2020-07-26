@@ -7,7 +7,7 @@ except ImportError:
     from urllib.error import URLError
 
 from .errors import FetchError
-from .data import ScheduledGame
+from .data import ScheduledGame, GameDetails
 
 
 # The number of seconds the code will wait for a response from the MLB API
@@ -125,9 +125,25 @@ class Api2:
         objects returned from the get_games method.
 
         """
+        import statsapi
         try:
             signal.alarm(GAME_FETCH_TIMEOUT)
-            raise NotImplementedError
+            response = statsapi.get('schedule',
+                    {'gamePk':game_id, 'sportId':1, 'hydrate':'linescore'})
+            gamedate = response['dates'][0]
+            game = gamedate['games'][0]
+            linescore = game['linescore']
+            return GameDetails(
+                    inning = linescore['currentInning'],
+                    home_team_runs = linescore['teams']['home']['runs'],
+                    away_team_runs = linescore['teams']['away']['runs'],
+                    balls = linescore['balls'],
+                    strikes = linescore['strikes'],
+                    outs = linescore['outs'],
+                    home_team_name = game['teams']['home']['team']['name'],
+                    away_team_name = game['teams']['away']['team']['name'],
+                    status = game['status']['detailedState'],
+                    inning_state = linescore['inningState'])
         except (URLError, _Timeout) as e:
             raise FetchError(e)
         finally:
