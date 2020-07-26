@@ -11,12 +11,14 @@ DESCRIPTION = 'Source code that powers my electronic scoreboard'
 URL = 'https://github.com/dowski/scoreboard'
 EMAIL = 'christian@dowski.com'
 AUTHOR = 'Christian Wyglendowski'
-REQUIRES_PYTHON = '>=2.7.0, <2.8.0'
+REQUIRES_PYTHON = '>=3.5.0, <4.0.0'
 VERSION = '0.9.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'mlbgame',
+    'MLB-StatsAPI == 0.1.9',
+    'python-dateutil == 2.8.1',
+    'luma.led_matrix == 1.4.1',
 ]
 
 REQUIRED_FOR_TESTS = [
