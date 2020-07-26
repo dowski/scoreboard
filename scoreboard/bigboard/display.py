@@ -6,7 +6,8 @@ to interface with the chip.
 """
 from .constants import DIGITS, BALLS, STRIKES, OUTS, TOP, BOTTOM
 from .constants import (
-        DISP_HOME, DISP_AWAY, DISP_INNING, DISP_BSO, DISP_BASES, DISP_ARROWS)
+        DISP_HOME, DISP_AWAY, DISP_INNING, DISP_BSO, DISP_BASES, DISP_ARROWS,
+        BASES_TO_DISP)
 
 from luma.led_matrix.device import max7219
 from luma.core.interface.serial import spi, noop
@@ -27,7 +28,7 @@ class DisplayController:
             'balls': 0,
             'strikes': 0,
             'outs': 0,
-            'baserunners': [],
+            'baserunners': (),
         }
 
     def on(self):
@@ -58,6 +59,11 @@ class DisplayController:
         self._data['outs'] = outs
         self._refresh()
 
+    def set_baserunners(self, bases_with_runners):
+        self._data['baserunners'] = tuple(
+                BASES_TO_DISP[base] for base in bases_with_runners)
+        self._refresh()
+
     def _refresh(self):
         with canvas(self.device) as draw:
             show_number(draw, self._data['home'], DISP_HOME)
@@ -67,7 +73,7 @@ class DisplayController:
             show_balls(draw, self._data['balls'])
             show_strikes(draw, self._data['strikes'])
             show_outs(draw, self._data['outs'])
-            #show_runners(draw, [FIRST, THIRD])
+            show_runners(draw, self._data['baserunners'])
 
 
 def number_to_digits(number):

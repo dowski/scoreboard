@@ -37,11 +37,11 @@ class GameTracker(object):
         self.mlbapi = mlbapi
         self.display = display
 
-    def track(self, game_id):
+    def track(self, scheduled_game):
         """Call this method to track a game.
 
-        The game_id is a string that can be acquired from the objects
-        returned from Api.get_games(). They have a game_id attribute on them.
+        The scheduled_game is an object that can be acquired calling
+        Api.get_games(). They have a game_id attribute on them.
 
         The game should be in a trackable state (call is_trackable to
         determine that) when calling this method. Otherwise it might
@@ -52,11 +52,11 @@ class GameTracker(object):
 
         """
         try:
-            game_details = self.mlbapi.get_game_detail(game_id)
+            game_details = self.mlbapi.get_game_detail(scheduled_game.game_id)
         except FetchError as e:
             print("rescheduling tracker; error fetching due to {}".format(
                     e.original_exception))
-            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
+            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (scheduled_game,))
             return
 
         if _is_bottom_of_inning(game_details):
@@ -72,24 +72,25 @@ class GameTracker(object):
                 strikes=_get_safe_number(game_details.strikes, 0),
                 outs=_get_safe_number(game_details.outs, 0))
 
-        print("%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d)" % (
-                game_details.home_team_name,
+        print("%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d, runners:%r)" % (
+                scheduled_game.home_team_name,
                 game_state.score.home,
-                game_details.away_team_name,
+                scheduled_game.away_team_name,
                 game_state.score.away,
                 game_details.inning_state,
                 game_state.inning.number,
                 game_state.balls,
                 game_state.strikes,
-                game_state.outs))
+                game_state.outs,
+                game_details.baserunners))
 
         render_state = game_state.derived_state
         self.display.set_away_runs(
                 _get_number_or_error_string(render_state.score.away),
-                is_favorite_team=self.team == game_details.away_team_name)
+                is_favorite_team=self.team == scheduled_game.away_team_name)
         self.display.set_home_runs(
                 _get_number_or_error_string(render_state.score.home),
-                is_favorite_team=self.team == game_details.home_team_name)
+                is_favorite_team=self.team == scheduled_game.home_team_name)
         self.display.set_inning(
                 _get_number_or_error_string(render_state.inning.number),
                 is_bottom=render_state.inning.half == Inning.BOTTOM)
@@ -97,8 +98,9 @@ class GameTracker(object):
                 balls=render_state.balls,
                 strikes=render_state.strikes,
                 outs=render_state.outs)
+        self.display.set_baserunners(game_details.baserunners)
         if self.is_trackable(render_state, game_details.status):
-            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (game_id,))
+            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (scheduled_game,))
         else:
             if game_details.status in [GAME_OVER, FINAL] \
                     or render_state.is_over:

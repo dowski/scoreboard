@@ -79,6 +79,12 @@ FIRST = 2
 SECOND = 4
 THIRD = 0
 
+BASES_TO_DISP = {
+    1: FIRST,
+    2: SECOND,
+    3: THIRD,
+}
+
 # Bits that represent the top/bottom indicator on DISP_ARROWS
 TOP = 7
 BOTTOM = 3

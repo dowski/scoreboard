@@ -10,14 +10,15 @@ GameDetails = namedtuple('GameDetails', [
     'balls',
     'strikes',
     'outs',
-    'home_team_name',
-    'away_team_name',
     'status',
     'inning_state',
+    'baserunners',
     ])
 
 ScheduledGame = namedtuple('ScheduledGame', [
     'game_id',
     'start_time',
+    'home_team_name',
+    'away_team_name',
     ])
 

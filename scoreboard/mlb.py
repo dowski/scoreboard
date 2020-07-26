@@ -13,6 +13,11 @@ from .data import ScheduledGame, GameDetails
 # The number of seconds the code will wait for a response from the MLB API
 # before raising a FetchError.
 GAME_FETCH_TIMEOUT = 10
+BASE_ORD_TO_NUMBER = {
+    "first": 1,
+    "second": 2,
+    "third": 3
+}
 
 
 class Api(object):
@@ -106,11 +111,15 @@ class Api2:
                 return []
             for gamedate in response['dates']:
                 for game in gamedate['games']:
+                    home_team_name=game['teams']['home']['team']['name']
+                    away_team_name=game['teams']['away']['team']['name']
                     scheduled_games.append(
                             ScheduledGame(
                                 game_id=game['gamePk'],
                                 start_time=dateutil.parser.isoparse(
-                                    game['gameDate'])))
+                                    game['gameDate']),
+                                home_team_name=home_team_name,
+                                away_team_name=away_team_name))
 
         except (URLError, _Timeout) as e:
             raise FetchError(e)
@@ -128,11 +137,9 @@ class Api2:
         import statsapi
         try:
             signal.alarm(GAME_FETCH_TIMEOUT)
-            response = statsapi.get('schedule',
-                    {'gamePk':game_id, 'sportId':1, 'hydrate':'linescore'})
-            gamedate = response['dates'][0]
-            game = gamedate['games'][0]
-            linescore = game['linescore']
+            response = statsapi.get('game', {'gamePk':game_id, 'fields':"gameData,teams,teamName,status,detailedState,liveData,linescore,home,away,runs,hits,errors,offense,outs,balls,strikes,first,second,third,currentInning,inningState"})
+            gamedata = response['gameData']
+            linescore = response['liveData']['linescore']
             return GameDetails(
                     inning = linescore['currentInning'],
                     home_team_runs = linescore['teams']['home']['runs'],
@@ -140,10 +147,11 @@ class Api2:
                     balls = linescore['balls'],
                     strikes = linescore['strikes'],
                     outs = linescore['outs'],
-                    home_team_name = game['teams']['home']['team']['name'],
-                    away_team_name = game['teams']['away']['team']['name'],
-                    status = game['status']['detailedState'],
-                    inning_state = linescore['inningState'])
+                    status = gamedata['status']['detailedState'],
+                    inning_state = linescore['inningState'],
+                    baserunners = tuple(
+                        BASE_ORD_TO_NUMBER[v]
+                        for v in linescore['offense'].keys()))
         except (URLError, _Timeout) as e:
             raise FetchError(e)
         finally:

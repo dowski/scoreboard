@@ -67,6 +67,9 @@ class DisplayController(object):
         self.inning_display.outs = outs
         self.inning_display.update()
 
+    def set_baserunners(self, bases_with_runners):
+        pass
+
     def _mainloop(self):
         command, values = None, []
         while command != 'stop':
