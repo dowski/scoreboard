@@ -11,10 +11,10 @@ DEFAULT_TEAM = "Indians"
 
 
 try:
-    from board.display import DisplayController
+    from .board.display import DisplayController
 except ImportError:
     try:
-        from bigboard.display import DisplayController
+        from .bigboard.display import DisplayController
     except ImportError:
         # The scoreboard hardware interface isn't available - stub it out
         class DisplayController:
