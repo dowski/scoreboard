@@ -60,9 +60,9 @@ class GameTracker(object):
             return
 
         if _is_bottom_of_inning(game_details):
-            inning = Inning.bottom.of(_get_safe_number(game_details.inning))
+            inning = Inning.bottom.of(game_details.inning)
         else:
-            inning = Inning.top.of(_get_safe_number(game_details.inning))
+            inning = Inning.top.of(game_details.inning)
         game_state = GameState(
                 inning=inning,
                 score=Score(
@@ -72,7 +72,7 @@ class GameTracker(object):
                 strikes=_get_safe_number(game_details.strikes, 0),
                 outs=_get_safe_number(game_details.outs, 0))
 
-        print("%s: %d, %s: %d, %s of %d (b:%d, s:%d, o:%d, runners:%r)" % (
+        print("%s: %d, %s: %d, %s of %s (b:%d, s:%d, o:%d, runners:%r)" % (
                 scheduled_game.home_team_name,
                 game_state.score.home,
                 scheduled_game.away_team_name,

@@ -41,8 +41,8 @@ class DisplayController:
         self.device.clear()
 
     def set_inning(self, value, is_bottom=False):
-        self._data['inning'] = value
-        if isinstance(value, str):
+        self._data['inning'] = value if value != -1 else None
+        if isinstance(value, str) or value == -1:
             self._data['half'] = None
         else:
             self._data['half'] = BOTTOM if is_bottom else TOP
@@ -88,6 +88,8 @@ def value_to_char(value):
     return ([], CHARS[value])
 
 def show_value(canvas, value, displays):
+    if value is None:
+        return
     if value in CHARS:
         result = value_to_char(value)
     else:

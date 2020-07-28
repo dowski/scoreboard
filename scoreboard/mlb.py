@@ -141,14 +141,14 @@ class Api2:
             gamedata = response['gameData']
             linescore = response['liveData']['linescore']
             return GameDetails(
-                    inning = linescore['currentInning'],
-                    home_team_runs = linescore['teams']['home']['runs'],
-                    away_team_runs = linescore['teams']['away']['runs'],
-                    balls = linescore['balls'],
-                    strikes = linescore['strikes'],
-                    outs = linescore['outs'],
+                    inning = linescore.get('currentInning', None),
+                    home_team_runs = linescore['teams']['home'].get('runs', 0),
+                    away_team_runs = linescore['teams']['away'].get('runs', 0),
+                    balls = linescore.get('balls', 0),
+                    strikes = linescore.get('strikes', 0),
+                    outs = linescore.get('outs', 0),
                     status = gamedata['status']['detailedState'],
-                    inning_state = linescore['inningState'],
+                    inning_state = linescore.get('inningState', 'top'),
                     baserunners = tuple(
                         BASE_ORD_TO_NUMBER[v]
                         for v in linescore['offense'].keys()))
