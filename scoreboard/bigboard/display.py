@@ -4,7 +4,7 @@ The board is powered by a MAX7219 chip and uses the luma.led_matrix library
 to interface with the chip.
 
 """
-from .constants import DIGITS, BALLS, STRIKES, OUTS, TOP, BOTTOM
+from .constants import DIGITS, CHARS, BALLS, STRIKES, OUTS, TOP, BOTTOM
 from .constants import (
         DISP_HOME, DISP_AWAY, DISP_INNING, DISP_BSO, DISP_BASES, DISP_ARROWS,
         BASES_TO_DISP)
@@ -42,7 +42,10 @@ class DisplayController:
 
     def set_inning(self, value, is_bottom=False):
         self._data['inning'] = value
-        self._data['half'] = BOTTOM if is_bottom else TOP
+        if isinstance(value, str):
+            self._data['half'] = None
+        else:
+            self._data['half'] = BOTTOM if is_bottom else TOP
         self._refresh()
 
     def set_away_runs(self, value, is_favorite_team=False):
@@ -66,9 +69,9 @@ class DisplayController:
 
     def _refresh(self):
         with canvas(self.device) as draw:
-            show_number(draw, self._data['home'], DISP_HOME)
-            show_number(draw, self._data['away'], DISP_AWAY)
-            show_number(draw, self._data['inning'], DISP_INNING)
+            show_value(draw, self._data['home'], DISP_HOME)
+            show_value(draw, self._data['away'], DISP_AWAY)
+            show_value(draw, self._data['inning'], DISP_INNING)
             show_inning_indicator(draw, self._data['half'])
             show_balls(draw, self._data['balls'])
             show_strikes(draw, self._data['strikes'])
@@ -78,11 +81,18 @@ class DisplayController:
 
 def number_to_digits(number):
     tens, ones = divmod(number, 10)
-    return DIGITS[tens] if tens else [], DIGITS[ones]
+    return (DIGITS[tens] if tens else [], DIGITS[ones])
 
-def show_number(canvas, number, displays):
-    disp1, disp2 = displays
-    for display, digits in zip(displays, number_to_digits(number)):
+def value_to_char(value):
+    # sets the value on the right-most display in the pair
+    return ([], CHARS[value])
+
+def show_value(canvas, value, displays):
+    if value in CHARS:
+        result = value_to_char(value)
+    else:
+        result = number_to_digits(value)
+    for display, digits in zip(displays, result):
         for bit in digits:
             canvas.point((display, bit), fill="red")
 
@@ -103,7 +113,8 @@ def show_runners(canvas, bases):
         canvas.point((DISP_BASES, bit), fill="red")
 
 def show_inning_indicator(canvas, top_or_bottom):
-    canvas.point((DISP_ARROWS, top_or_bottom), fill="red")
+    if top_or_bottom is not None:
+        canvas.point((DISP_ARROWS, top_or_bottom), fill="red")
 
 
 if __name__ == '__main__':

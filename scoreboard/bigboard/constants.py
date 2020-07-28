@@ -45,6 +45,12 @@ DIGITS = {
     9: NINE,
 }
 
+F = [SEG_TOP, SEG_TOP_LEFT, SEG_MIDDLE, SEG_BOTTOM_LEFT]
+
+CHARS = {
+    "F": F,
+}
+
 
 # Maps numbers of balls to the bits required to render them on DISP_BSO
 BALLS = {
