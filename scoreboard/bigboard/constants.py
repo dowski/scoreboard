@@ -55,28 +55,28 @@ CHARS = {
 # Maps numbers of balls to the bits required to render them on DISP_BSO
 BALLS = {
     0:[],
-    1:[4],
-    2:[4,5],
-    3:[4,5,6],
-    4:[4,5,6],
+    1:[6],
+    2:[6,5],
+    3:[6,5,4],
+    4:[6,5,4],
 }
 
 
 # Maps numbers of strikes to the bits required to render them on DISP_BSO
 STRIKES = {
     0:[],
-    1: [2],
-    2: [2,3],
-    3: [2,3],
+    1: [3],
+    2: [3,2],
+    3: [3,2],
 }
 
 
 # Maps numbers of outs to the bits required to render them on DISP_BSO
 OUTS = {
     0:[],
-    1: [0],
-    2: [0,1],
-    3: [0,1],
+    1: [1],
+    2: [1,0],
+    3: [1,0],
 }
 
 # Bits that represent the bases on DISP_BASES
