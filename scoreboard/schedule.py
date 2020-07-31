@@ -62,9 +62,11 @@ class GameScheduler(object):
                 wait_game = (
                         game.start_time - datetime.datetime.now(
                             dateutil.tz.UTC)).seconds
-                print(("Tracking for today's game (%s) will start at "
+                print(("Tracking for today's game (id=%s) will start at "
                         "%s (%d seconds from now)") % (
-                                game.game_id, _format_time(game.start_time),
+                                game.game_id, _format_time(
+                                    game.start_time.astimezone(
+                                        dateutil.tz.tzlocal())),
                                 wait_game))
                 self.jobs.enter(
                         wait_game, 0, self.tracker.track, (game.game_id,))
