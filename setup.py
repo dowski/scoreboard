@@ -62,10 +62,9 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=('tests',)),
-
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    entry_points={
+        'console_scripts': ['scoreboard=scoreboard.scoreboard:start'],
+    },
     install_requires=REQUIRED,
     setup_requires=REQUIRED_FOR_SETUP,
     tests_require=REQUIRED_FOR_TESTS,

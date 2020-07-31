@@ -1,5 +1,6 @@
 import datetime
 import sched
+import sys
 import time
 
 from . import mlb
@@ -34,6 +35,10 @@ except ImportError:
                 pass
 
 
+def start():
+    main(sys.argv)
+
+
 def main(argv):
     if len(argv) > 1:
         team = argv[1]
@@ -56,5 +61,4 @@ def main(argv):
         display.off()
 
 if __name__ == '__main__':
-    import sys
     main(sys.argv)
