@@ -7,7 +7,7 @@ to interface with the chip.
 from .constants import DIGITS, CHARS, BALLS, STRIKES, OUTS, TOP, BOTTOM
 from .constants import (
         DISP_HOME, DISP_AWAY, DISP_INNING, DISP_BSO, DISP_BASES, DISP_ARROWS,
-        BASES_TO_DISP)
+        BASES_TO_DISP, DECIMAL)
 
 from luma.led_matrix.device import max7219
 from luma.core.interface.serial import spi, noop
@@ -29,6 +29,7 @@ class DisplayController:
             'strikes': 0,
             'outs': 0,
             'baserunners': (),
+            'favorite': None,
         }
 
     def on(self):
@@ -50,10 +51,14 @@ class DisplayController:
 
     def set_away_runs(self, value, is_favorite_team=False):
         self._data['away'] = value
+        if is_favorite_team:
+            self._data['favorite'] = 'away'
         self._refresh()
 
     def set_home_runs(self, value, is_favorite_team=False):
         self._data['home'] = value
+        if is_favorite_team:
+            self._data['favorite'] = 'home'
         self._refresh()
 
     def set_inning_state(self, balls, strikes, outs):
@@ -69,9 +74,17 @@ class DisplayController:
 
     def _refresh(self):
         with canvas(self.device) as draw:
-            show_value(draw, self._data['home'], DISP_HOME)
-            show_value(draw, self._data['away'], DISP_AWAY)
-            show_value(draw, self._data['inning'], DISP_INNING)
+            show_value(
+                    draw,
+                    self._data['home'],
+                    DISP_HOME,
+                    highlight=self._data['favorite'] == 'home')
+            show_value(
+                    draw,
+                    self._data['away'],
+                    DISP_AWAY,
+                    highlight=self._data['favorite'] == 'away')
+            show_value(draw, self._data['inning'], DISP_INNING, highlight=False)
             show_inning_indicator(draw, self._data['half'])
             show_balls(draw, self._data['balls'])
             show_strikes(draw, self._data['strikes'])
@@ -87,13 +100,15 @@ def value_to_char(value):
     # sets the value on the right-most display in the pair
     return ([], CHARS[value])
 
-def show_value(canvas, value, displays):
+def show_value(canvas, value, displays, highlight):
     if value is None:
         return
     if value in CHARS:
         result = value_to_char(value)
     else:
         result = number_to_digits(value)
+    if highlight:
+        result = (result[0], result[1] + DECIMAL)
     for display, digits in zip(displays, result):
         for bit in digits:
             canvas.point((display, bit), fill="red")
