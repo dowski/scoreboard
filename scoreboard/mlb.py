@@ -1,10 +1,8 @@
 import dateutil.parser
 import signal
+import statsapi
 
-try:
-    from urllib2 import URLError
-except ImportError:
-    from urllib.error import URLError
+from requests.exceptions import ConnectionError
 
 from .errors import FetchError
 from .data import ScheduledGame, GameDetails
@@ -20,72 +18,7 @@ BASE_ORD_TO_NUMBER = {
 }
 
 
-class Api(object):
-    """A lightweight interface to the MLB API."""
-
-    def get_games(self, date, team):
-        """Returns a list of games for a team on a given date.
-
-        The date should be a datetime instance and the team name should be a
-        capitalized string name (e.g. "Indians").
-
-        """
-        import mlbgame
-        try:
-            signal.alarm(GAME_FETCH_TIMEOUT)
-            raw_games = mlbgame.day(date.year, date.month, date.day,
-                    home=team, away=team)
-            todays_games = []
-            for game in raw_games:
-                # hack the start time until my PR is accepted
-                year, month, day = game.game_id.split('_')[:3]
-                game_start_date = "/".join([year, month, day])
-                start_time = datetime.datetime.strptime(
-                       " ".join([game_start_date,
-                            game.game_start_time.replace(' ', '')]),
-                       "%Y/%m/%d %I:%M%p")
-                game.start_time = start_time
-                todays_games.append(game)
-            return todays_games
-        except (URLError, _Timeout, ValueError) as e:
-            # mlbgame returns ValueError for any HTTPError, so we treat it as
-            # a retryable error here
-            raise FetchError(e)
-        finally:
-            signal.alarm(0)
-
-    def get_game_detail(self, game_id):
-        """Returns detailed information about a game.
-
-        The game_id is a string that can be found in the game_id attribute of
-        objects returned from the get_games method.
-
-        """
-        import mlbgame
-        try:
-            signal.alarm(GAME_FETCH_TIMEOUT)
-            game_details = mlbgame.overview(game_id)
-            return game_details
-        except (URLError, _Timeout, ValueError) as e:
-            # mlbgame returns ValueError for any HTTPError, so we treat it as
-            # a retryable error here
-            raise FetchError(e)
-        finally:
-            signal.alarm(0)
-
-    @staticmethod
-    def install_alarm_handler():
-        """Enables timeout handling when talking to the MLB API.
-
-        This method should be called once at the start of a program to ensure
-        timeout handling is correctly configured.
-
-        """
-        def handle_alarm(ignored, alsoignored):
-            raise _Timeout()
-        signal.signal(signal.SIGALRM, handle_alarm)
-
-class Api2:
+class Api:
     def get_games(self, date, team_name):
         """Returns a list of games for a team on a given date.
 
@@ -93,18 +26,18 @@ class Api2:
         capitalized string name (e.g. "Indians").
 
         """
-        import statsapi
-        response = statsapi.get('teams', {'sportId':1, 'leagueIds':'103, 104'})
-        for team in response['teams']:
-            if team['teamName'] == team_name:
-                team_id = team['id']
-                break
-        else:
-            raise RuntimeError("team not found:" + team_name)
-
-        scheduled_games = []
         try:
             signal.alarm(GAME_FETCH_TIMEOUT)
+            response = statsapi.get(
+                    'teams', {'sportId':1, 'leagueIds':'103, 104'})
+            for team in response['teams']:
+                if team['teamName'] == team_name:
+                    team_id = team['id']
+                    break
+            else:
+                raise RuntimeError("team not found:" + team_name)
+
+            scheduled_games = []
             response = statsapi.get('schedule',
                     {'sportId':1, 'teamId':team_id, 'date':date.isoformat()})
             if not response['dates']:
@@ -121,7 +54,7 @@ class Api2:
                                 home_team_name=home_team_name,
                                 away_team_name=away_team_name))
 
-        except (URLError, _Timeout) as e:
+        except (ConnectionError, _Timeout) as e:
             raise FetchError(e)
         finally:
             signal.alarm(0)
@@ -134,7 +67,6 @@ class Api2:
         objects returned from the get_games method.
 
         """
-        import statsapi
         try:
             signal.alarm(GAME_FETCH_TIMEOUT)
             response = statsapi.get('game', {'gamePk':game_id, 'fields':"gameData,teams,teamName,status,detailedState,liveData,linescore,home,away,runs,hits,errors,offense,outs,balls,strikes,first,second,third,currentInning,inningState"})
@@ -152,7 +84,7 @@ class Api2:
                     baserunners = tuple(
                         BASE_ORD_TO_NUMBER[v]
                         for v in linescore['offense'].keys()))
-        except (URLError, _Timeout) as e:
+        except (ConnectionError, _Timeout) as e:
             raise FetchError(e)
         finally:
             signal.alarm(0)

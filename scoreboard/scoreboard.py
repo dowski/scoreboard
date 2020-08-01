@@ -45,10 +45,10 @@ def main(argv):
     else:
         team = DEFAULT_TEAM
 
-    mlb.Api2.install_alarm_handler()
+    mlb.Api.install_alarm_handler()
     jobs = sched.scheduler(time.time, time.sleep)
     display = DisplayController()
-    api = mlb.Api2()
+    api = mlb.Api()
     game_tracker = tracker.GameTracker(team, jobs, api, display)
     game_scheduler = schedule.GameScheduler(jobs, team, game_tracker, api)
 
