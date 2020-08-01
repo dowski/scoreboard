@@ -69,7 +69,7 @@ class GameScheduler(object):
                                         dateutil.tz.tzlocal())),
                                 wait_game))
                 self.jobs.enter(
-                        wait_game, 0, self.tracker.track, (game.game_id,))
+                        wait_game, 0, self.tracker.track, (game,))
         # Naive timezone-less datetime instances are used here to check the schedule
         # at 8:00 AM local time the next day.
         next_day = (datetime.datetime.now()
