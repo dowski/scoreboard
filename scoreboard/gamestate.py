@@ -71,6 +71,9 @@ class GameState(object):
 
     @property
     def is_over(self):
+        if self.inning.number is None:
+            # The game hasn't started yet
+            return False
         return self.final \
                 or (self.inning.number >= 9 \
                 and self.inning.half == Inning.BOTTOM \

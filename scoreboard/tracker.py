@@ -86,13 +86,13 @@ class GameTracker(object):
 
         render_state = game_state.derived_state
         self.display.set_away_runs(
-                _get_number_or_error_string(render_state.score.away),
+                render_state.score.away,
                 is_favorite_team=self.team in scheduled_game.away_team_name)
         self.display.set_home_runs(
-                _get_number_or_error_string(render_state.score.home),
+                render_state.score.home,
                 is_favorite_team=self.team in scheduled_game.home_team_name)
         self.display.set_inning(
-                _get_number_or_error_string(render_state.inning.number),
+                render_state.inning.number,
                 is_bottom=render_state.inning.half == Inning.BOTTOM)
         self.display.set_inning_state(
                 balls=render_state.balls,
@@ -121,5 +121,3 @@ def _is_bottom_of_inning(game_details):
 def _get_safe_number(value, default=-1):
     return value if value != '' else default
 
-def _get_number_or_error_string(value):
-    return value if value >= 0 else '-'

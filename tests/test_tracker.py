@@ -1,6 +1,9 @@
+import datetime
+
 from mock import MagicMock, ANY
 
 from scoreboard import tracker
+from scoreboard.data import ScheduledGame
 from scoreboard.errors import FetchError
 
 
@@ -12,9 +15,14 @@ def test_track_with_immediate_network_error_reschedules_and_returns():
     mlbapi.get_game_detail.side_effect = FetchError(original=None)
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
-    jobs.enter.assert_called_with(tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+    jobs.enter.assert_called_with(tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
     display.set_away_runs.assert_not_called()
     display.set_home_runs.assert_not_called()
     display.set_inning.assert_not_called()
@@ -22,7 +30,12 @@ def test_track_with_immediate_network_error_reschedules_and_returns():
 def test_track_with_results_sets_them_on_the_display():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.home_team_name = "Indians"
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_away_runs.assert_called_with(
             game_details.away_team_runs, is_favorite_team=False)
@@ -37,7 +50,12 @@ def test_track_with_results_sets_them_on_the_display():
 def test_track_top_of_inning_handling():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning_state = "Top"
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_once_with(
             game_details.inning, is_bottom=False)
@@ -45,7 +63,12 @@ def test_track_top_of_inning_handling():
 def test_track_middle_of_inning_handling():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning_state = "Middle"
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_once_with(
             game_details.inning, is_bottom=False)
@@ -53,7 +76,12 @@ def test_track_middle_of_inning_handling():
 def test_track_bottom_of_inning_handling():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning_state = "Bottom"
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_once_with(
             game_details.inning, is_bottom=True)
@@ -61,7 +89,12 @@ def test_track_bottom_of_inning_handling():
 def test_track_end_of_inning_handling():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning_state = "End"
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_once_with(
             game_details.inning, is_bottom=True)
@@ -69,75 +102,117 @@ def test_track_end_of_inning_handling():
 def test_track_with_results_game_trackable_reschedules():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.IN_PROGRESS)
+    game_details.inning = 5
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_called_with(
-            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
 
 def test_track_with_results_manager_challenge_reschedules():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.CHALLENGE_PREFIX + " whatever")
+    game_details.inning = 4
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_called_with(
-            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
 
 def test_track_with_results_umpire_review_reschedules():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status="Umpire review: whatever")
+    game_details.inning = 4
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_called_with(
-            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
 
 def test_track_with_results_delay_reschedules():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status="Delay: whatever")
+    game_details.inning = 4
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_called_with(
-            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
 
 def test_track_with_results_delayed_start_reschedules():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status="Delayed Start: whatever")
+    game_details.inning = None
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_called_with(
-            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, ("foo",))
+            tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
 
 def test_track_with_results_game_not_trackable_doesnt_reschedule():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.CANCELLED)
+    game_details.inning = None
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     jobs.enter.assert_not_called()
 
 def test_track_with_results_game_over_shows_final_for_inning():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.GAME_OVER)
+    game_details.inning = 9
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_with("F")
 
@@ -148,20 +223,30 @@ def test_track_with_gamestate_is_over_shows_final_for_inning():
     game_details.home_team_runs = 2
     game_details.away_team_runs = 1
 
-    game_tracker.track("foo")
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
     display.set_inning.assert_called_with("F")
 
-def test_track_with_invalid_runs_and_inning_doesnt_fail():
+def test_track_with_missing_runs_and_inning_doesnt_fail():
     game_tracker, display, game_details = get_tracker_display_and_details()
-    game_details.inning = ""
-    game_details.home_team_runs = ""
-    game_details.away_team_runs = ""
-    game_tracker.track("foo")
+    game_details.inning = None
+    game_details.home_team_runs = 0
+    game_details.away_team_runs = 0
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
 
-    display.set_inning.assert_called_once_with('-', is_bottom=ANY)
-    display.set_away_runs.assert_called_with('-', is_favorite_team=ANY)
-    display.set_home_runs.assert_called_with('-', is_favorite_team=ANY)
+    display.set_inning.assert_called_once_with(None, is_bottom=ANY)
+    display.set_away_runs.assert_called_with(0, is_favorite_team=ANY)
+    display.set_home_runs.assert_called_with(0, is_favorite_team=ANY)
 
 
 def get_deps():
@@ -174,6 +259,9 @@ def get_deps():
 def get_tracker_display_and_details():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock()
+    game_details.inning = None
+    game_details.home_team_runs = 0
+    game_details.away_team_runs = 0
     mlbapi.get_game_detail.return_value = game_details
 
     game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
