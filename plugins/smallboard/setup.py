@@ -16,7 +16,8 @@ VERSION = '0.9.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'gpiozero',
+    'gpiozero == 1.5.1',
+    'rpi.gpio == 0.7.0',
 ]
 
 REQUIRED_FOR_TESTS = [
