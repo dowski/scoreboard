@@ -18,7 +18,6 @@ VERSION = '0.9.0'
 REQUIRED = [
     'MLB-StatsAPI == 0.1.9',
     'python-dateutil == 2.8.1',
-    'luma.led_matrix == 1.4.1',
 ]
 
 REQUIRED_FOR_TESTS = [
