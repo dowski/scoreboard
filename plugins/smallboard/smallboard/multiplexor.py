@@ -55,11 +55,11 @@ class Multiplexor(object):
         with self.shift_register.latch():
             self.shift_register.shift_out(self.right_bits)
         self.right_digit.on()
-        time.sleep(0.005)
+        time.sleep(0.004)
         self.right_digit.off()
 
         with self.shift_register.latch():
             self.shift_register.shift_out(self.left_bits)
         self.left_digit.on()
-        time.sleep(0.005)
+        time.sleep(0.004)
         self.left_digit.off()
