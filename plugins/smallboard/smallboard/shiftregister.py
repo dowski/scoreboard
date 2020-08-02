@@ -34,5 +34,5 @@ if __name__ == '__main__':
         sr.shift_out([1] * 16)
     control.left_display.on()
     control.right_display.on()
-    raw_input('press enter')
+    input('press enter')
 

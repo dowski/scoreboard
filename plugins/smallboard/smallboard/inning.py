@@ -55,5 +55,5 @@ if __name__ == '__main__':
         inning.strikes = random.randint(0,2)
         inning.outs = random.randint(0,2)
         inning.update()
-        print inning
-        raw_input("press a enter to continue or ctrl-c to quit")
+        print(inning)
+        input("press a enter to continue or ctrl-c to quit")
