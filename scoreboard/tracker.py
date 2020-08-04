@@ -91,9 +91,12 @@ class GameTracker(object):
         self.display.set_home_runs(
                 render_state.score.home,
                 is_favorite_team=self.team in scheduled_game.home_team_name)
-        self.display.set_inning(
-                render_state.inning.number,
-                is_bottom=render_state.inning.half == Inning.BOTTOM)
+        if _is_delayed(game_details.status):
+            self.display.set_inning("d")
+        else:
+            self.display.set_inning(
+                    render_state.inning.number,
+                    is_bottom=render_state.inning.half == Inning.BOTTOM)
         self.display.set_inning_state(
                 balls=render_state.balls,
                 strikes=render_state.strikes,
@@ -114,6 +117,10 @@ class GameTracker(object):
                 or status.startswith(CHALLENGE_PREFIX)
                 or status.startswith(UMPIRE_REVIEW_PREFIX)
                 or status.startswith(DELAY_PREFIX))
+
+
+def _is_delayed(status):
+    return status.startswith(DELAY_PREFIX)
 
 def _is_bottom_of_inning(game_details):
     return game_details.inning_state.lower() in ["bottom", "end"]
