@@ -1,7 +1,8 @@
 # Digital Baseball Scoreboard
 
-The software to power my digital baseball scoreboard. A custom board is
-required for the software to really do anything.
+The software to power a digital baseball scoreboard. Once started, it will
+follow the schedule for the team of your choosing and fetch data and display live
+details during games.
 
 ## Getting Started
 
@@ -20,13 +21,13 @@ python setup.py install
 After it's installed, you can run the following command to start the software:
 
 ```
-python -m scoreboard.scoreboard <Uppercase Team Name>
+scoreboard <Uppercase Team Name>
 ```
 
 e.g.
 
 ```
-python -m scoreboard.scoreboard Indians
+scoreboard Indians
 ```
 
 ## Running the tests
@@ -40,8 +41,10 @@ python setup.py test
 
 ## Built With
 
-* [mlbgame](http://panz.io/mlbgame/) - Library for accessing MLB game data
+* [MLB-StatsAPI](https://github.com/toddrob99/MLB-StatsAPI) - Library for accessing MLB game data
 * [gpiozero](https://gpiozero.readthedocs.io/) - Hardware interface library for the Raspberry Pi
+* [luma.led_matrix](https://github.com/rm-hull/luma.led_matrix) - A library to drive displays using the MAX7219 LED driver
+* [python-dateutil](https://pypi.org/project/python-dateutil/) - Useful time/date functionality to complement the standard library `datetime` library
 
 ## Authors
 
