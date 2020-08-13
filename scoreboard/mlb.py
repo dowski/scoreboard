@@ -2,7 +2,7 @@ import dateutil.parser
 import signal
 import statsapi
 
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, HTTPError
 
 from .errors import FetchError
 from .data import ScheduledGame, GameDetails
@@ -54,7 +54,7 @@ class Api:
                                 home_team_name=home_team_name,
                                 away_team_name=away_team_name))
 
-        except (ConnectionError, _Timeout) as e:
+        except (ConnectionError, HTTPError, _Timeout) as e:
             raise FetchError(e)
         finally:
             signal.alarm(0)
@@ -84,7 +84,7 @@ class Api:
                     baserunners = tuple(
                         BASE_ORD_TO_NUMBER[v]
                         for v in linescore['offense'].keys()))
-        except (ConnectionError, _Timeout) as e:
+        except (ConnectionError, HTTPError, _Timeout) as e:
             raise FetchError(e)
         finally:
             signal.alarm(0)

@@ -16,7 +16,7 @@ VERSION = '0.9.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'MLB-StatsAPI == 0.1.9',
+    'MLB-StatsAPI == 1.0.0',
     'python-dateutil == 2.8.1',
 ]
 
