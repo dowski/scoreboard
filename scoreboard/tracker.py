@@ -12,8 +12,8 @@ REPLAY = "Replay"
 REVIEW = "Review"
 GAME_OVER = "Game Over"
 FINAL = "Final"
-CHALLENGE_PREFIX = "Manager challenge:"
-UMPIRE_REVIEW_PREFIX = "Umpire review:"
+CHALLENGE_PREFIX = "Manager challenge"
+UMPIRE_REVIEW_PREFIX = "Umpire review"
 DELAY_PREFIX = "Delay"
 TRACKABLE_STATUSES = set([
     IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, REPLAY, REVIEW])
