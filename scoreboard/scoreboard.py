@@ -1,4 +1,3 @@
-import datetime
 import pkg_resources
 import sched
 import sys
@@ -9,7 +8,7 @@ from . import schedule
 from . import tracker
 
 
-DEFAULT_TEAM = "Indians"
+DEFAULT_TEAM = "Guardians"
 
 DisplayController = None
 display_plugins = list(
