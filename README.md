@@ -27,7 +27,7 @@ scoreboard <Uppercase Team Name>
 e.g.
 
 ```
-scoreboard Indians
+scoreboard Guardians
 ```
 
 ## Running the tests
