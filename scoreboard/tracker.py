@@ -68,7 +68,7 @@ class GameTracker(object):
                 raise e
             print("rescheduling GameTracker; error fetching due to {}".format(
                 e.original_exception))
-            self.jobs.enter(RESCHEDULE_DELAY, 0, self.track, (scheduled_game,))
+            self.jobs.enter(RESCHEDULE_DELAY, 0, self._track_internal, (scheduled_game, post_game_callback))
             # Assume the game is trackable until we know otherwise
             return True
 
