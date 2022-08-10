@@ -23,7 +23,7 @@ def test_track_with_retry_immediate_network_error_reschedules_and_returns():
         away_team_name="Chicago Cubs")
     game_tracker.track_with_retry(game)
 
-    jobs.enter.assert_called_with(tracker.RESCHEDULE_DELAY, 0, game_tracker.track, (game,))
+    jobs.enter.assert_called_with(tracker.RESCHEDULE_DELAY, 0, game_tracker._track_internal, (game, ANY))
     display.set_away_runs.assert_not_called()
     display.set_home_runs.assert_not_called()
     display.set_inning.assert_not_called()
