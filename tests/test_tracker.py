@@ -247,6 +247,24 @@ def test_track_with_gamestate_is_over_shows_final_for_inning():
     display.set_inning.assert_called_with("F")
 
 
+def test_track_with_gamestate_is_over_clears_runners_on_base():
+    game_tracker, display, game_details = get_tracker_display_and_details()
+    game_details.inning = 9
+    game_details.inning_state = "End"
+    game_details.home_team_runs = 2
+    game_details.away_team_runs = 1
+    game_details.baserunners = (1, 3)
+
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
+
+    display.set_baserunners.assert_called_with(())
+
+
 def test_track_with_missing_runs_and_inning_doesnt_fail():
     game_tracker, display, game_details = get_tracker_display_and_details()
     game_details.inning = None

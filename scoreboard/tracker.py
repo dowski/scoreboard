@@ -118,6 +118,7 @@ class GameTracker(object):
         if game_details.status in [GAME_OVER, FINAL] \
                 or render_state.is_over:
             self.display.set_inning("F")
+            self.display.set_baserunners(())
         print("game no longer trackable, status:", game_details.status)
         if internal_tracking and post_game_callback:
             post_game_callback()
