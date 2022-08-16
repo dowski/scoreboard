@@ -3,6 +3,7 @@ from .gamestate import GameState, Inning, Score
 
 IN_PROGRESS = "In Progress"
 WARMUP = "Warmup"
+PRE_GAME = "Pre-Game"
 FINAL = "Final"
 CANCELLED = "Cancelled"
 DELAYED = "Delayed"
@@ -13,7 +14,7 @@ GAME_OVER = "Game Over"
 CHALLENGE_PREFIX = "Manager challenge"
 UMPIRE_REVIEW_PREFIX = "Umpire review"
 DELAY_PREFIX = "Delay"
-TRACKABLE_STATUSES = {IN_PROGRESS, WARMUP, DELAYED, DELAYED_START, REPLAY, REVIEW}
+TRACKABLE_STATUSES = {IN_PROGRESS, WARMUP, PRE_GAME, DELAYED, DELAYED_START, REPLAY, REVIEW}
 RESCHEDULE_DELAY = 10
 
 

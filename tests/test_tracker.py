@@ -196,6 +196,24 @@ def test_track_with_results_delayed_start_reschedules():
         tracker.RESCHEDULE_DELAY, 0, game_tracker._track_internal, (game, None))
 
 
+def test_track_with_results_pre_game_reschedules():
+    team, jobs, mlbapi, display = get_deps()
+    game_details = MagicMock(status="Pre-Game")
+    game_details.inning = None
+    mlbapi.get_game_detail.return_value = game_details
+
+    game_tracker = tracker.GameTracker(team, jobs, mlbapi, display)
+    game = ScheduledGame(
+        game_id="foo",
+        start_time=datetime.datetime.now(),
+        home_team_name="Cleveland Indians",
+        away_team_name="Chicago Cubs")
+    game_tracker.track(game)
+
+    jobs.enter.assert_called_with(
+        tracker.RESCHEDULE_DELAY, 0, game_tracker._track_internal, (game, None))
+
+
 def test_track_with_results_game_not_trackable_doesnt_reschedule():
     team, jobs, mlbapi, display = get_deps()
     game_details = MagicMock(status=tracker.CANCELLED)
