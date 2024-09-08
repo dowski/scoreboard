@@ -1,8 +1,14 @@
 # Digital Baseball Scoreboard
 
-The software to power a digital baseball scoreboard. Once started, it will
-follow the schedule for the team of your choosing and fetch data and display live
-details during games.
+This repo contains software to power a digital baseball scoreboard. Once started, 
+it will follow the schedule for the team of your choosing and fetch data and display
+live details during games.
+
+This is what the scoreboard I built looks like.
+
+![Front of scoreboard](https://github.com/dowski/scoreboard/blob/master/media/scoreboard-front.jpg?raw=true)
+
+![Back of scoreboard](https://github.com/dowski/scoreboard/blob/master/media/scoreboard-back.jpg?raw=true)
 
 ## Getting Started
 
@@ -41,14 +47,14 @@ python setup.py test
 
 ## Built With
 
-* [MLB-StatsAPI](https://github.com/toddrob99/MLB-StatsAPI) - Library for accessing MLB game data
-* [gpiozero](https://gpiozero.readthedocs.io/) - Hardware interface library for the Raspberry Pi
-* [luma.led_matrix](https://github.com/rm-hull/luma.led_matrix) - A library to drive displays using the MAX7219 LED driver
-* [python-dateutil](https://pypi.org/project/python-dateutil/) - Useful time/date functionality to complement the standard library `datetime` library
+- [MLB-StatsAPI](https://github.com/toddrob99/MLB-StatsAPI) - Library for accessing MLB game data
+- [gpiozero](https://gpiozero.readthedocs.io/) - Hardware interface library for the Raspberry Pi
+- [luma.led_matrix](https://github.com/rm-hull/luma.led_matrix) - A library to drive displays using the MAX7219 LED driver
+- [python-dateutil](https://pypi.org/project/python-dateutil/) - Useful time/date functionality to complement the standard library `datetime` library
 
 ## Authors
 
-* **Christian Wyglendowski** 
+- **Christian Wyglendowski**
 
 ## License
 
