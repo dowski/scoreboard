@@ -55,7 +55,7 @@ def main(argv):
 
     mlb.Api.install_alarm_handler()
     jobs = sched.scheduler(time.time, time.sleep)
-    display = delayed_display.DelayedDisplay(jobs, DisplayController(), delay=15)
+    display = delayed_display.DelayedDisplay(jobs, DisplayController(), delay=30)
     api = mlb.Api()
     game_tracker = tracker.GameTracker(team, jobs, api, display)
     game_scheduler = schedule.GameScheduler(jobs, team, game_tracker, api)
