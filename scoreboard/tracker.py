@@ -11,7 +11,8 @@ DELAYED_START = "Delayed Start"
 REPLAY = "Replay"
 REVIEW = "Review"
 GAME_OVER = "Game Over"
-CHALLENGE_PREFIX = "Manager challenge"
+MANAGER_CHALLENGE_PREFIX = "Manager challenge"
+PLAYER_CHALLENGE_PREFIX = "Player challenge"
 UMPIRE_REVIEW_PREFIX = "Umpire review"
 DELAY_PREFIX = "Delay"
 TRACKABLE_STATUSES = {IN_PROGRESS, WARMUP, PRE_GAME, DELAYED, DELAYED_START, REPLAY, REVIEW}
@@ -129,7 +130,8 @@ class GameTracker(object):
     def is_trackable(game_state, status):
         return not game_state.is_over and (
                 status in TRACKABLE_STATUSES
-                or status.startswith(CHALLENGE_PREFIX)
+                or status.startswith(MANAGER_CHALLENGE_PREFIX)
+                or status.startswith(PLAYER_CHALLENGE_PREFIX)
                 or status.startswith(UMPIRE_REVIEW_PREFIX)
                 or status.startswith(DELAY_PREFIX))
 
